@@ -1,0 +1,31 @@
+Ajánlott API-k a projekthez:
+Publikus API-k:
+Események listázása
+
+URL: GET /api/events
+Leírás: Publikus események listájának lekérése, szűrési lehetőségekkel (helyszín, dátum, kategória).
+Válasz: Események neve, leírása, helyszín, dátumok.
+Helyszínek listázása
+
+URL: GET /api/locations
+Leírás: Helyszínek és felszereltségi adatok lekérése publikus megtekintéshez.
+Válasz: Helyszínek neve, címe, felszereltség.
+Regisztrációhoz kötött API-k:
+Esemény létrehozása
+
+URL: POST /api/events
+Leírás: Új esemény létrehozása a szervezők számára.
+Követelmény: Hitelesítés szükséges (szerepkör: Szervező).
+Kérés: Esemény neve, leírása, kezdési és befejezési dátum, helyszín.
+Jegyvásárlás
+
+URL: POST /api/tickets
+Leírás: Eseményekhez jegy vásárlása a felhasználók számára.
+Követelmény: Hitelesítés szükséges (szerepkör: Felhasználó).
+Kérés: Esemény ID, ár.
+Felhasználói jelentések kezelése
+
+URL: POST /api/reports
+Leírás: Felhasználói jelentések küldése problémákhoz vagy eseményekhez.
+Követelmény: Hitelesítés szükséges.
+Kérés: Jelentés tartalma, esemény ID.
