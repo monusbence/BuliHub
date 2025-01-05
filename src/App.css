@@ -1,4 +1,4 @@
-/* Alap nullázás */
+/* Globális beállítások */
 *,
 *::before,
 *::after {
@@ -11,16 +11,79 @@ body {
   background: #000;
   color: #fff;
   font-family: 'Arial', sans-serif;
-  /* A görgetés tiltását JS-ben, locked változóval kezeljük:
-     locked = true => body.style.overflow = 'hidden'
-     locked = false => 'auto'
-  */
 }
 
-/* Alap konténer */
+/* SPLASH SCREEN */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000; /* tetszés szerint #fff is lehet */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* minden fölött legyen */
+}
+
+/* A logó (3 lüktetés + lassú megjelenés) */
+.splash-logo {
+  width: 300px; /* nagyobb logó */
+  height: auto;
+  animation: pulseAndFade 4s ease forwards;
+}
+
+@keyframes pulseAndFade {
+  0% {
+    transform: scale(1);
+    opacity: 0; /* eleinte láthatatlan */
+  }
+  10% {
+    opacity: 1; /* ekkor már láthatóvá válik */
+  }
+
+  /* 1. lüktetés */
+  20% {
+    transform: scale(1.2);
+  }
+  25% {
+    transform: scale(1);
+  }
+
+  /* 2. lüktetés */
+  40% {
+    transform: scale(1.2);
+  }
+  45% {
+    transform: scale(1);
+  }
+
+  /* 3. lüktetés */
+  60% {
+    transform: scale(1.2);
+  }
+  65% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0; /* a végére eltűnik */
+  }
+}
+
+/* Az alkalmazás fő konténere, amely finoman jelenik meg (fade in) */
 .app-container {
   width: 100vw;
-  /* magasságot a section-ök határozzák meg */
+  transition: opacity 1s ease; /* smooth feloldás */
+  opacity: 1; /* alaphelyzetben látható (ha nincs .hidden) */
+}
+
+/* Ha a splash screen még aktív (showSplash===true), rejtsük el a fő oldalt */
+.app-container.hidden {
+  opacity: 0;
+  pointer-events: none; /* ne lehessen interakcióba lépni */
 }
 
 /* NAVBAR */
@@ -38,13 +101,14 @@ body {
   z-index: 999;
 }
 
-.navbar .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
+/* Bal felső sarokban a logó képként */
+.navbar .logo img {
+  width: 120px;
+  height: auto;
+  display: block;
 }
 
-/* Sima menülista – asztali nézetben */
+/* NAV-LINKS */
 .nav-links {
   list-style: none;
   display: flex;
@@ -60,17 +124,18 @@ body {
   transition: color 0.3s ease;
 }
 
+/* Hover: az összes link */
 .nav-links li a:hover {
-  color: #0ff;
+  color: #0ff; /* Hover: kék */
 }
 
-/* Hamburger ikon – csak mobil nézetben */
+/* Hamburger menu */
 .hamburger {
-  display: none; /* Asztali nézetben elrejtjük */
+  display: none; /* asztali nézeten rejtve, mobilon látható */
   flex-direction: column;
   cursor: pointer;
   margin-left: auto;
-  padding: 0.5rem; /* kicsit nagyobb kattintható terület */
+  padding: 0.5rem;
 }
 
 .hamburger span {
@@ -81,24 +146,22 @@ body {
   transition: 0.3s;
 }
 
-/* Ha a hamburgerre rákattintunk, aktiválódik: X ikonná alakul */
+/* Hamburger-ikon animáció nyitáskor */
 .hamburger.active span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
-
 .hamburger.active span:nth-child(2) {
   opacity: 0;
 }
-
 .hamburger.active span:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* SECTION */
+/* SECTIONS – alapértelmezett beállítások */
 section {
   width: 100vw;
   min-height: 100vh;
-  padding: 80px 2rem 2rem; /* 80px, hogy a navbar ne takarja el a tetejét */
+  padding: 40px 2rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -106,10 +169,12 @@ section {
   text-align: center;
 }
 
-/* 1. SECTION - háttérkép és gradient overlay */
+/* SECTION 1 */
 #section1 {
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.4),
+      rgba(0, 0, 0, 0.4)
+    ),
     url("components/dodli.webp") no-repeat center center;
   background-size: cover;
   position: relative;
@@ -131,89 +196,181 @@ section {
   text-align: left;
 }
 
-/* 2. SECTION - színes átmenet */
+/* SECTION 2 */
 #section2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(
-    135deg,
-    #0013a3 0%,
-    #58009b 30%,
-    #640099 60%,
-    #7d0068 100%
+    180deg,
+    rgb(21, 40, 153) 0%,
+    rgb(105, 15, 146) 42%,
+    rgb(107, 31, 143) 63%,
+    rgb(255, 255, 255) 100%
   );
 }
 
 .cards-container {
   display: flex;
-  gap: 2rem;
-  max-width: 1200px;
+  gap: 3rem;
+  max-width: 1400px;
   margin: 0 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .card {
-  flex: 1 1 300px;
-  max-width: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 0 10px #0ff; /* Neon hatású árnyék */
+  width: 300px;
+  background-color: white;
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* 3. SECTION - lineáris átmenet */
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px 10px rgba(45, 255, 196, 0.81);
+}
+
+.gradient-number {
+  font-size: 4rem;
+  font-weight: bold;
+  line-height: 1.2;
+  background: linear-gradient(
+    90deg,
+    rgba(34, 68, 255, 1) 0%,
+    rgba(205, 29, 253, 1) 42%,
+    rgba(252, 176, 69, 1) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card p {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  color: #000;
+  font-weight: 500;
+}
+
+/* SECTION 3 */
 #section3 {
-  background: linear-gradient(135deg, #48c6ef, #6f86d6);
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
 }
 
-/* RESPONSIVE / Mobil (max-width: 768px) */
-@media (max-width: 768px) {
-  .navbar {
-    padding: 0 1rem;
-  }
-
-  /* A hamburger ekkor látható */
-  .hamburger {
-    display: flex;
-  }
-
-  /* A nav-links mobilon alapból rejtve, megnyitáskor (open) jön be */
-  .nav-links {
-    position: absolute;
-    top: 60px; /* navbar alatt */
-    right: 0;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
-    width: 200px;
-    padding: 1rem;
-    transform: translateY(-200%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .nav-links.open {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .nav-links li {
-    margin: 1rem 0;
-  }
-
-  .section1-content {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .section1-content .text {
-    max-width: 100%;
-  }
+.section3-content {
+  display: flex;
+  flex-direction: row;
+  gap: 5vw;
+  max-width: 1400px;
+  width: 100%;
 }
 
-/* -- TELEFON STÍLUSOK -- */
+.left-side {
+  flex: 1;
+}
 
-/* Külső keret */
+.right-side {
+  max-width: 450px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#section3 h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+#section3 p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #000;
+}
+
+/* FORM STYLES */
+.party-form {
+  border-radius: 16px;
+  max-width: 800px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.6s ease;
+}
+
+.party-form:hover {
+  box-shadow: 0px 0px 66px 3px rgba(255, 255, 255, 0.9);
+}
+
+.party-form .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.party-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #1b1b1b;
+}
+
+.party-form input,
+.party-form select,
+.party-form textarea {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #363636;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.party-form input::placeholder,
+.party-form textarea::placeholder {
+  color: #2c2c2c;
+}
+
+.party-form input:focus,
+.party-form select:focus,
+.party-form textarea:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.party-form textarea {
+  resize: vertical;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #c841c6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #a735a2;
+}
+
+/* TELEFONKERET STÍLUSOK */
 .telokeret {
   width: 310px;
   height: 670px;
@@ -229,7 +386,6 @@ section {
   padding: 0;
 }
 
-/* Felső sáv (notch) */
 .top-bar {
   width: 100%;
   height: 50px;
@@ -251,7 +407,6 @@ section {
   justify-content: space-around;
 }
 
-/* Hangszóró a notchban */
 .speaker {
   width: 50px;
   height: 6px;
@@ -259,7 +414,6 @@ section {
   border-radius: 3px;
 }
 
-/* Kamera pötty */
 .camera-dot {
   width: 8px;
   height: 8px;
@@ -268,7 +422,6 @@ section {
   border-radius: 50%;
 }
 
-/* Belső kijelző (login) */
 .phone-screen {
   width: 95%;
   height: 85%;
@@ -278,9 +431,9 @@ section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   position: relative;
-  padding-top: 15px; 
+  padding-top: 15px;
 }
 
 .logo-img {
@@ -321,7 +474,6 @@ section {
   color: #5e5e5e;
 }
 
-/* Bejelentkező gomb */
 .login-btn {
   width: 80%;
   padding: 12px;
@@ -353,7 +505,6 @@ section {
   text-decoration: underline;
 }
 
-/* Alsó sáv (home indicator) */
 .bottom-bar {
   width: 100%;
   height: 50px;
@@ -371,4 +522,93 @@ section {
   background-color: #ffffff;
   border-radius: 3px;
   margin-top: 25px;
+}
+
+/* MOBILNÉZETRE VONATKOZÓ MEDIA QUERY */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  .hamburger {
+    display: flex; /* mobilon látszik */
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    width: 200px;
+    padding: 1rem;
+    transform: translateY(-200%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-links li {
+    margin: 1rem 0;
+  }
+
+  .section1-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .section1-content .text {
+    max-width: 100%;
+  }
+
+  .cards-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .party-form {
+    width: 100%;
+  }
+
+  .party-form .form-group {
+    margin-bottom: 15px;
+  }
+
+  #section3 h2 {
+    font-size: 1.8rem;
+  }
+
+  #section3 p {
+    font-size: 1rem;
+  }
+
+  .section3-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .right-side img {
+    max-width: 80%;
+    height: auto;
+  }
+}
+
+/* 4. menüpont: „Hitelesített szervező vagyok” link stílus */
+.nav-links li:nth-child(4) a {
+  color: #0ff !important;
+}
+
+.nav-links li:nth-child(4) a:hover {
+  color: #fff !important;
 }
