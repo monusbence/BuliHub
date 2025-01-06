@@ -1,26 +1,25 @@
-// App.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import './App.css';
 
 const App: React.FC = () => {
-  // 1. Splash Screen állapota
+  // Splash Screen állapota
   const [showSplash, setShowSplash] = useState(true);
 
-  // 2. A telefon forgatásához kapcsolódó progress
+  // A telefon forgatásához kapcsolódó progress
   const [progress, setProgress] = useState<number>(0);
   const [locked, setLocked] = useState<boolean>(true);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-  // Splash Screen 4 másodperces időzítéssel
+  // Splash Screen 4 másodperces időzítés
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 4000); // 4s = annyit tart az animáció
+    }, 4000); // 4 mp után tűnik el
     return () => clearTimeout(timer);
   }, []);
 
-  // A forgatás ideje alatt tiltjuk a scroll-t
+  // A forgatás ideje alatt tiltjuk a body scroll-t
   useEffect(() => {
     document.body.style.overflow = locked ? 'hidden' : 'auto';
     return () => {
@@ -96,14 +95,14 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* SPLASH SCREEN (3 lüktetés, lassú fade in) */}
+      {/* SPLASH SCREEN (3 lüktetés + lassú fade in) */}
       {showSplash && (
         <div className="splash-screen">
           <img src="./AppLogo(png).png" alt="App Logo" className="splash-logo" />
         </div>
       )}
 
-      {/* FŐ TARTALOM (csak akkor látható, ha a showSplash false) */}
+      {/* FŐ TARTALOM (csak akkor látszik, ha a splash screen már eltűnt) */}
       <div
         className={`app-container ${showSplash ? 'hidden' : ''}`}
         onWheel={handleWheel}
@@ -139,10 +138,11 @@ const App: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="#section3" onClick={() => setIsMenuOpen(false)}>
-                Hitelesített szervező vagyok
-              </a>
-            </li>
+  {/* régi: <a href="#section3" onClick={() => setIsMenuOpen(false)}> */}
+  <a href="/certified" onClick={() => setIsMenuOpen(false)}>
+    Hitelesített szervezői regisztráció
+  </a>
+</li>
           </ul>
         </nav>
 
@@ -167,7 +167,11 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="phone-screen">
-                <img src="./MainLogo(png).png" alt="logo" className="logo-img" />
+                <img
+                  src="./MainLogo(png).png"
+                  alt="logo"
+                  className="logo-img"
+                />
                 <h2 className="login-title">Bejelentkezés</h2>
 
                 <div className="input-group">
@@ -191,7 +195,14 @@ const App: React.FC = () => {
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
-                <a href="#" className="register-link">
+                
+                {/* Új fülön nyitja a /register útvonalat (példa) */}
+                <a
+                  href="/register"
+                  className="register-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Regisztrálj új fiókot
                 </a>
               </div>

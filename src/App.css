@@ -20,16 +20,16 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000; /* tetszés szerint #fff is lehet */
+  background: #000; /* Lehet #fff, ha akarod */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* minden fölött legyen */
+  z-index: 9999; /* Minden fölött */
 }
 
 /* A logó (3 lüktetés + lassú megjelenés) */
 .splash-logo {
-  width: 300px; /* nagyobb logó */
+  width: 300px; 
   height: auto;
   animation: pulseAndFade 4s ease forwards;
 }
@@ -37,10 +37,10 @@ body {
 @keyframes pulseAndFade {
   0% {
     transform: scale(1);
-    opacity: 0; /* eleinte láthatatlan */
+    opacity: 0; /* Eleinte láthatatlan */
   }
   10% {
-    opacity: 1; /* ekkor már láthatóvá válik */
+    opacity: 1; /* Láthatóvá válik */
   }
 
   /* 1. lüktetés */
@@ -69,7 +69,7 @@ body {
 
   100% {
     transform: scale(1);
-    opacity: 0; /* a végére eltűnik */
+    opacity: 0; /* A végére eltűnik */
   }
 }
 
@@ -77,13 +77,13 @@ body {
 .app-container {
   width: 100vw;
   transition: opacity 1s ease; /* smooth feloldás */
-  opacity: 1; /* alaphelyzetben látható (ha nincs .hidden) */
+  opacity: 1; /* Alapesetben látható */
 }
 
-/* Ha a splash screen még aktív (showSplash===true), rejtsük el a fő oldalt */
+/* Ha a splash screen aktív (showSplash===true), rejtsük el a fő oldalt */
 .app-container.hidden {
   opacity: 0;
-  pointer-events: none; /* ne lehessen interakcióba lépni */
+  pointer-events: none; 
 }
 
 /* NAVBAR */
@@ -101,7 +101,7 @@ body {
   z-index: 999;
 }
 
-/* Bal felső sarokban a logó képként */
+/* Bal felső sarokban lévő logó */
 .navbar .logo img {
   width: 120px;
   height: auto;
@@ -124,14 +124,13 @@ body {
   transition: color 0.3s ease;
 }
 
-/* Hover: az összes link */
 .nav-links li a:hover {
-  color: #0ff; /* Hover: kék */
+  color: #0ff; 
 }
 
-/* Hamburger menu */
+/* Hamburger menu (mobilon) */
 .hamburger {
-  display: none; /* asztali nézeten rejtve, mobilon látható */
+  display: none; /* asztali nézeten rejtve */
   flex-direction: column;
   cursor: pointer;
   margin-left: auto;
@@ -146,7 +145,6 @@ body {
   transition: 0.3s;
 }
 
-/* Hamburger-ikon animáció nyitáskor */
 .hamburger.active span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }

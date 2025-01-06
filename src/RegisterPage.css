@@ -1,0 +1,193 @@
+/* nullázás */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Alap betűkészlet, fehér háttér */
+body {
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* FŐKONTAINER */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAVBAR */
+.navbar {
+  width: 100%;
+  height: 60px;
+  background-color: #000; /* feketés */
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.navbar-logo img {
+  width: 120px;
+  height: auto;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #0ff;
+}
+
+/* KÉT OSZLOP: BAL LOGÓ, JOBB FORM */
+.register-content {
+  display: flex;
+  flex: 1;            /* kitölti a maradék helyet a navbar alatt */
+  width: 100%;
+  align-items: center; 
+  padding: 2rem;
+  gap: 2rem;
+  /* Ha fix max-szélességet akarsz a teljes tartalomnak:
+     max-width: 1400px;
+     margin: 0 auto; 
+  */
+}
+
+/* BAL OSZLOP */
+.left-column {
+  width: 350px;  /* fix szélesség a logónak */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.buhu-logo {
+  width: 100%;
+  height: auto;
+  max-width: 300px;
+  object-fit: contain;
+}
+
+/* JOBB OSZLOP - TÖLTSÖN KI MINDENT */
+.right-column {
+  flex: 1;  /* A jobb oldal kitölti a maradék helyet */
+  display: flex;
+  align-items: center;
+}
+
+/* A regisztrációs doboz */
+.register-box {
+  width: 100%;
+  max-width: 400px; /* ha nem akarod túl szélesre engedni */
+  margin: 0 auto;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+}
+
+/* Cím */
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+/* Hibák */
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #b00;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* FORM */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #333;
+}
+
+.form-group input {
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: #000;    /* Példa: fekete input */
+  color: #fff;
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+/* Gomb */
+.btn-submit {
+  padding: 0.8rem;
+  background-color: #c841c6;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+  background-color: #a735a2;
+}
+
+/* MOBILNÉZET (max 768px) */
+@media (max-width: 768px) {
+  .register-content {
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .left-column {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .buhu-logo {
+    max-width: 200px;
+  }
+
+  .right-column {
+    width: 100%;
+  }
+
+  .register-box {
+    max-width: 100%;
+    padding: 1rem;
+  }
+}
