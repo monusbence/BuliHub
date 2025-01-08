@@ -610,3 +610,13 @@ section {
 .nav-links li:nth-child(4) a:hover {
   color: #fff !important;
 }
+.store-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.store-buttons .store-icon {
+  width: 200px; /* kisebb méret */
+  height: auto;
+}

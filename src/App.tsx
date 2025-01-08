@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, px } from 'framer-motion';
 import './App.css';
 
 const App: React.FC = () => {
@@ -138,11 +138,10 @@ const App: React.FC = () => {
               </a>
             </li>
             <li>
-  {/* régi: <a href="#section3" onClick={() => setIsMenuOpen(false)}> */}
-  <a href="/certified" onClick={() => setIsMenuOpen(false)}>
-    Hitelesített szervezői regisztráció
-  </a>
-</li>
+              <a href="/certified" onClick={() => setIsMenuOpen(false)}>
+                Hitelesített szervezői regisztráció
+              </a>
+            </li>
           </ul>
         </nav>
 
@@ -151,7 +150,24 @@ const App: React.FC = () => {
           <div className="section1-content">
             <div className="text">
               <h1>Üdvözöllek a BuliHub oldalán!</h1>
-              <p>Hozd ki a maximumot minden éjszakából!</p>
+              {/* 
+                Ezt a sor korábban így nézett ki:
+                <p>Hozd ki a maximumot minden éjszakából!</p>
+                Most kicseréljük két gombra/képre (Google Play és App Store)
+              */}
+              <div className="store-buttons">
+                <img
+                  src="./src/google-play.png"
+                  alt="Google Play"
+                  className="store-icon"
+                />
+                <img
+                  src="./src/app-storee.png"
+                  alt="App Store"
+                  className="store-icon"
+                  
+                />
+              </div>
             </div>
 
             {/* Telefon animáció */}
@@ -195,8 +211,7 @@ const App: React.FC = () => {
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
-                
-                {/* Új fülön nyitja a /register útvonalat (példa) */}
+
                 <a
                   href="/register"
                   className="register-link"
