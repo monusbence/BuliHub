@@ -1,6 +1,0 @@
-rating az szarmaztatott
-company name helyet adoszam eetleg!
-eventbe userID nem kell!
-posted helyett begin es end!
-végpontok osszegyujtese
-alapvaz alkalmazas megcsinalasa
