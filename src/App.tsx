@@ -98,7 +98,7 @@ const App: React.FC = () => {
       {/* SPLASH SCREEN (3 lüktetés + lassú fade in) */}
       {showSplash && (
         <div className="splash-screen">
-          <img src="./AppLogo(png).png" alt="App Logo" className="splash-logo" />
+          <img src="./kepek_jegyzetek/AppLogo(png).png" alt="App Logo" className="splash-logo" />
         </div>
       )}
 
@@ -110,7 +110,7 @@ const App: React.FC = () => {
         {/* NAVBAR */}
         <nav className="navbar">
           <div className="logo">
-            <img src="./MainLogo(png).png" alt="BuliHub Logo" />
+            <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
           </div>
           <div
             className={`hamburger ${isMenuOpen ? 'active' : ''}`}
@@ -129,7 +129,7 @@ const App: React.FC = () => {
             </li>
             <li>
               <a href="#section2" onClick={() => setIsMenuOpen(false)}>
-                Események
+                Eredmények
               </a>
             </li>
             <li>
@@ -161,11 +161,10 @@ const App: React.FC = () => {
                   alt="Google Play"
                   className="store-icon"
                 />
-                <img
+                <img 
                   src="./src/app-storee.png"
                   alt="App Store"
                   className="store-icon"
-                  
                 />
               </div>
             </div>
@@ -184,7 +183,7 @@ const App: React.FC = () => {
               </div>
               <div className="phone-screen">
                 <img
-                  src="./MainLogo(png).png"
+                  src="./kepek_jegyzetek/MainLogo(png).png"
                   alt="logo"
                   className="logo-img"
                 />

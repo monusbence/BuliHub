@@ -169,11 +169,8 @@ section {
 
 /* SECTION 1 */
 #section1 {
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.4),
-      rgba(0, 0, 0, 0.4)
-    ),
-    url("components/dodli.webp") no-repeat center center;
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+              url("components/dodli_blur.png") no-repeat center center;
   background-size: cover;
   position: relative;
 }
@@ -396,9 +393,9 @@ section {
 }
 
 .camera-notch {
-  width: 140px;
-  height: 30px;
-  background-color: #222;
+  width: 100px;
+  height: 20px;
+  background-color: #141414;
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -406,9 +403,9 @@ section {
 }
 
 .speaker {
-  width: 50px;
+  width: 40px;
   height: 6px;
-  background-color: #555;
+  background-color: #2f2f2f;
   border-radius: 3px;
 }
 
@@ -515,7 +512,7 @@ section {
 }
 
 .home-indicator {
-  width: 80px;
+  width: 100px;
   height: 5px;
   background-color: #ffffff;
   border-radius: 3px;
