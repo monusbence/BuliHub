@@ -1,23 +1,51 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using BuliHub_Backend.Data;
+using BuliHub_Backend.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1) MySQL kapcsolat (appsettings.json -> "BuliHubConnection")
+var connectionString = builder.Configuration.GetConnectionString("BuliHubConnection");
 
+// 2) EF Core + Pomelo MySQL
+builder.Services.AddDbContext<BuliHubDbContext>(options =>
+{
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString));
+});
+
+// 3) ASP.NET Core Identity
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+{
+    // Példa Identity beállítások:
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = false;
+    // stb.
+})
+.AddEntityFrameworkStores<BuliHubDbContext>()
+.AddDefaultTokenProviders();
+
+// 4) Kontroller
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// (Opcionális) Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Identity pipeline
 app.UseHttpsRedirection();
-
+app.UseAuthentication();   // Fontos a belépés/hozzáférés vezérléséhez
 app.UseAuthorization();
 
 app.MapControllers();
