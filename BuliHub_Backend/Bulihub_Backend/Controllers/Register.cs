@@ -1,7 +1,7 @@
 ﻿// Controllers/AuthController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using BuliHub_Backend.Models;
+using Bulihub_Backend.Models;
 
 namespace BuliHub_Backend.Controllers
 {

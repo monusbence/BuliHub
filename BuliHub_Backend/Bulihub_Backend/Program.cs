@@ -3,11 +3,7 @@ using Bulihub_Backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Bulihub_Backend.Data;
-using Bulihub_Backend.Models;
-using Microsoft.SqlServer.Management.Smo;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
