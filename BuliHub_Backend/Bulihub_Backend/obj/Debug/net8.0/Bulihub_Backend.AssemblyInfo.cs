@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bulihub_Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7b74e2f907889a1590295012cb929705577c9b1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e38689f82d39f30c929d7a96ad7cfedfb007ab30")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bulihub_Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bulihub_Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
