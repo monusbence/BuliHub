@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import RegisterPage from './RegisterPage.tsx'
-import CertifiedRegisterPage from './CertifiedRegisterPage.tsx' 
+import CertifiedOrganizerRegistration from './CertifiedOrganizerRegistration.tsx' 
 // Ha még nincs CertifiedRegisterPage.tsx fájlod, akkor hozd létre!
 
 createRoot(document.getElementById('root')!).render(
@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Hitelesített szervezői regisztrációs oldal ("/certified" útvonal) */}
-        <Route path="/certified" element={<CertifiedRegisterPage />} />
+        <Route path="/certified" element={<CertifiedOrganizerRegistration />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

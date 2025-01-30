@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, px } from 'framer-motion';
+import { motion } from 'framer-motion';
 import './App.css';
 
 const App: React.FC = () => {
@@ -27,19 +27,37 @@ const App: React.FC = () => {
     };
   }, [locked]);
 
-  // Görgetés esemény a telefon forgatáshoz
+  // <<< Itt a FRISSÍTETT handleWheel >>>
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      if (!locked) return;
-      e.preventDefault();
       const SCROLL_DISTANCE = 500;
       const delta = e.deltaY;
-      const newProgress = progress + delta / SCROLL_DISTANCE;
-      const clampedProgress = Math.max(0, Math.min(1, newProgress));
-      setProgress(clampedProgress);
 
-      if (clampedProgress >= 1) {
-        setLocked(false);
+      if (locked) {
+        // Előreforgatás 0 -> 1
+        e.preventDefault();
+        const newProgress = progress + delta / SCROLL_DISTANCE;
+        const clampedProgress = Math.max(0, Math.min(1, newProgress));
+        setProgress(clampedProgress);
+
+        if (clampedProgress >= 1) {
+          setLocked(false);
+        }
+      } else {
+        // Ha NINCS lezárva (locked = false), de a lap tetején vagyunk és felfelé görgetünk,
+        // akkor "visszaforgatjuk" a telefont 1 -> 0
+        if (window.scrollY === 0 && delta < 0 && progress > 0) {
+          e.preventDefault();
+          const newProgress = progress + delta / SCROLL_DISTANCE;
+          const clampedProgress = Math.max(0, Math.min(1, newProgress));
+          setProgress(clampedProgress);
+
+          if (clampedProgress <= 0) {
+            setLocked(true);
+          }
+        }
+        // Minden más esetben (pl. nem a tetején vagy épp lefelé görget),
+        // nem akadályozzuk a görgetést, így nincs preventDefault.
       }
     },
     [locked, progress]
@@ -98,7 +116,11 @@ const App: React.FC = () => {
       {/* SPLASH SCREEN (3 lüktetés + lassú fade in) */}
       {showSplash && (
         <div className="splash-screen">
-          <img src="./kepek_jegyzetek/AppLogo(png).png" alt="App Logo" className="splash-logo" />
+          <img
+            src="./kepek_jegyAppLogo(png).png"
+            alt="App Logo"
+            className="splash-logo"
+          />
         </div>
       )}
 
@@ -110,7 +132,10 @@ const App: React.FC = () => {
         {/* NAVBAR */}
         <nav className="navbar">
           <div className="logo">
-            <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
+            <img
+              src="./kepek_jegyzetek/MainLogo(png).png"
+              alt="BuliHub Logo"
+            />
           </div>
           <div
             className={`hamburger ${isMenuOpen ? 'active' : ''}`}
@@ -150,18 +175,13 @@ const App: React.FC = () => {
           <div className="section1-content">
             <div className="text">
               <h1>Üdvözöllek a BuliHub oldalán!</h1>
-              {/* 
-                Ezt a sor korábban így nézett ki:
-                <p>Hozd ki a maximumot minden éjszakából!</p>
-                Most kicseréljük két gombra/képre (Google Play és App Store)
-              */}
               <div className="store-buttons">
                 <img
                   src="./src/google-play.png"
                   alt="Google Play"
                   className="store-icon"
                 />
-                <img 
+                <img
                   src="./src/app-storee.png"
                   alt="App Store"
                   className="store-icon"
@@ -349,7 +369,11 @@ const App: React.FC = () => {
               <img
                 src="src/telcsi.png"
                 alt="party-pic"
-                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                style={{
+                  maxWidth: '100%',
+                  height: 'auto',
+                  borderRadius: '8px',
+                }}
               />
             </div>
           </div>
