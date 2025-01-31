@@ -310,7 +310,6 @@ const App: React.FC = () => {
                 <a
                   href="/register"
                   className="register-link"
-                  target="_blank"
                   rel="noopener noreferrer"
                 >
                   Regisztrálj új fiókot

@@ -52,7 +52,7 @@ const Register: React.FC = () => {
       {/* NAVBAR (bemásolva az App.tsx-ből) */}
       <nav className="navbar">
         <div className="logo">
-          <img src="./MainLogo(png).png" alt="BuliHub Logo" />
+          <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
         </div>
         <div
           className={`hamburger ${isMenuOpen ? 'active' : ''}`}
@@ -107,7 +107,7 @@ const Register: React.FC = () => {
           }}
         >
           <img
-            src="./AppLogo(png).png"
+            src="./kepek_jegyzetek/AppLogo(png).png"
             alt="App Logo"
             style={{ width: '500px', height: 'auto' }}
           />
