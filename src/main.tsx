@@ -1,28 +1,20 @@
-// main.tsx
 import React from 'react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-
 import './index.css'
-import App from './App.tsx'
-import RegisterPage from './RegisterPage.tsx'
-import CertifiedOrganizerRegistration from './CertifiedOrganizerRegistration.tsx' 
-// Ha még nincs CertifiedRegisterPage.tsx fájlod, akkor hozd létre!
+import App from './App'
+import RegisterPage from './RegisterPage'
+import EventsPage from './components/eventsPage.tsx' // Figyelj a pontos elérési útra és a nagybetűkre
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        {/* Főoldal ("/" útvonal) */}
-        <Route path="/" element={<App />} />
-
-        {/* Regisztrációs oldal ("/register" útvonal) */}
-        <Route path="/register" element={<RegisterPage />} />
-
-        {/* Hitelesített szervezői regisztrációs oldal ("/certified" útvonal) */}
-        <Route path="/certified" element={<CertifiedOrganizerRegistration />} />
-      </Routes>
-    </BrowserRouter>
+  <Routes>
+    <Route path="/" element={<App />} />
+    <Route path="/register" element={<RegisterPage />} />
+    <Route path="/events" element={<EventsPage />} />
+  </Routes>
+</BrowserRouter>
   </StrictMode>,
 )

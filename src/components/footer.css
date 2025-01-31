@@ -1,0 +1,172 @@
+.footer {
+    width: 100%;
+    background-color: #111; /* Sötét háttér a felső részhez */
+    color: #fff;
+    margin-top: 2rem;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* FELSŐ SÁV (többoszlopos) */
+  .footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+  
+    /* Eltávolítjuk a max-width-et és a margin: 0 auto-t, hogy kifusson a teljes szélességben */
+    /* max-width: 1300px; */
+    /* margin: 0 auto; */
+  
+    /* Inkább valamennyi belső paddingot adunk balra és jobbra. */
+    padding: 2rem 5vw;
+  }
+  
+  .footer-column {
+    flex: 1 1 200px;
+    min-width: 200px;
+  }
+  
+  .footer-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-description {
+    line-height: 1.5;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-column h3 {
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    border-bottom: 2px solid #c841c6;
+    display: inline-block;
+    padding-bottom: 4px;
+  }
+  
+  /* Linklista (2. oszlop pl. gyorslinkekhez) */
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .footer-links li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links a:hover {
+    color: #fff;
+  }
+  
+  /* Elérhetőségek (3. oszlop) */
+  .footer-column p {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Hírlevél (4. oszlop) */
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 250px;
+  }
+  
+  .newsletter-form input {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .newsletter-form .newsletter-btn {
+    background-color: #c841c6;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .newsletter-form .newsletter-btn:hover {
+    background-color: #a735a2;
+  }
+  
+  /* ALSÓ SÁV (social ikonok, jogi információk) – FEHÉR háttér */
+  .footer-bottom {
+    background-color: #ffffff; /* Fehér háttér az alsó résznek */
+    color: #000;           /* Fekete szöveg a fehér alapon */
+    border-top: 1px solid #333;
+  
+    /* Ugyanúgy nem használunk max-width és margin: 0 auto */
+    /* max-width: 1300px; */
+    /* margin: 0 auto; */
+  
+    /* Kis belső tér, hogy ne tapadjon szélhez */
+    padding: 1rem 5vw;
+  
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .footer-bottom p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  
+  /* Social ikonok */
+  .footer-socials {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .footer-socials a {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  .footer-socials a:hover {
+    opacity: 1;
+  }
+  
+  .footer-socials img {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* RESZPONZÍV ALKALMAZKODÁS */
+  @media (max-width: 768px) {
+    .footer-top {
+      flex-direction: column;
+      gap: 2rem;
+      /* Marad a padding, de lehet kisebb is, ha szeretnéd */
+      padding: 2rem 5vw;
+    }
+  
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 5vw;
+    }
+  }
+  

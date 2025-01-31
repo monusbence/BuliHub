@@ -1,25 +1,57 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import Footer from './components/footer'; // vagy ahogy az útvonalad alakul
 import './App.css';
 
 const App: React.FC = () => {
-  // Splash Screen állapota
+  // SPLASH SCREEN ÁLLAPOT
   const [showSplash, setShowSplash] = useState(true);
 
-  // A telefon forgatásához kapcsolódó progress
+  // TELEFON FORGATÁS ÁLLAPOTOK
   const [progress, setProgress] = useState<number>(0);
   const [locked, setLocked] = useState<boolean>(true);
+
+  // NAVBAR/HAMBURGER MENÜ
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-  // Splash Screen 4 másodperces időzítés
+  // FELUGRÓ ABLAK (MODAL) ÁLLAPOT
+  const [isCertifiedModalOpen, setIsCertifiedModalOpen] = useState<boolean>(false);
+
+  // HITELSZERVEZŐ FORM STATE
+  const [certifiedFormData, setCertifiedFormData] = useState({
+    organizerName: '',
+    companyName: '',
+    taxNumber: '',
+    companyRegisterNumber: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+    website: '',
+    shortDescription: '',
+    bankAccount: '',
+    idDocument: null as File | null,
+  });
+
+  // Buli létrehozó FORM STATE
+  const [formData, setFormData] = useState({
+    partyName: '',
+    date: '',
+    time: '',
+    location: '',
+    guests: '',
+    theme: '',
+    description: '',
+  });
+
+  // SPLASH SCREEN IDŐZÍTÉS (4 mp)
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 4000); // 4 mp után tűnik el
+    }, 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  // A forgatás ideje alatt tiltjuk a body scroll-t
+  // BODY SCROLL TILTÁSA (telefon forgatás) – Ha locked, ne lehessen görgetni
   useEffect(() => {
     document.body.style.overflow = locked ? 'hidden' : 'auto';
     return () => {
@@ -27,7 +59,17 @@ const App: React.FC = () => {
     };
   }, [locked]);
 
-  // <<< Itt a FRISSÍTETT handleWheel >>>
+  // BODY SCROLL TILTÁSA A MODAL NYITÁSÁNÁL (opcionális plusz)
+  useEffect(() => {
+    if (isCertifiedModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Ha lezárás, visszaállítjuk
+      document.body.style.overflow = locked ? 'hidden' : 'auto';
+    }
+  }, [isCertifiedModalOpen, locked]);
+
+  // GÖRGETÉS KEZELÉSE (Telefon forgatás)
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
       const SCROLL_DISTANCE = 500;
@@ -44,8 +86,7 @@ const App: React.FC = () => {
           setLocked(false);
         }
       } else {
-        // Ha NINCS lezárva (locked = false), de a lap tetején vagyunk és felfelé görgetünk,
-        // akkor "visszaforgatjuk" a telefont 1 -> 0
+        // Visszaforgatás 1 -> 0 (ha a lap tetején vagyunk és felfelé görgetünk)
         if (window.scrollY === 0 && delta < 0 && progress > 0) {
           e.preventDefault();
           const newProgress = progress + delta / SCROLL_DISTANCE;
@@ -56,38 +97,30 @@ const App: React.FC = () => {
             setLocked(true);
           }
         }
-        // Minden más esetben (pl. nem a tetején vagy épp lefelé görget),
-        // nem akadályozzuk a görgetést, így nincs preventDefault.
       }
     },
     [locked, progress]
   );
 
-  // A telefon forgatás szöge: -15°-ról 0°-ra
+  // TELEFON FORGÁS SZÖGE
   const startAngle = -15;
   const endAngle = 0;
   const rotateAngle = startAngle + (endAngle - startAngle) * progress;
 
-  // Hamburger menü
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
+  // HAMBURGER MENÜ
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  // MODAL NYITÁS / ZÁRÁS
+  const openCertifiedModal = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault(); 
+    setIsMenuOpen(false);
+    setIsCertifiedModalOpen(true);
   };
+  const closeCertifiedModal = () => setIsCertifiedModalOpen(false);
 
-  // Form state + űrlapkezelés
-  const [formData, setFormData] = useState({
-    partyName: '',
-    date: '',
-    time: '',
-    location: '',
-    guests: '',
-    theme: '',
-    description: '',
-  });
-
+  // Buli létrehozó form kezelése
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -99,6 +132,7 @@ const App: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Buli adatok:', formData);
+    alert('A buli sikeresen létrehozva!');
     setFormData({
       partyName: '',
       date: '',
@@ -108,23 +142,65 @@ const App: React.FC = () => {
       theme: '',
       description: '',
     });
-    alert('A buli sikeresen létrehozva!');
+  };
+
+  // HITELSZERVEZŐ (CERTIFIED) FORM KEZELÉSE
+  const handleCertifiedInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setCertifiedFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCertifiedFormData((prev) => ({
+        ...prev,
+        idDocument: e.target.files![0],
+      }));
+    }
+  };
+
+  const handleCertifiedSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Hitelesített adatok:', certifiedFormData);
+    alert('Köszönjük! A hitelesítés folyamatban van.');
+    // Itt jöhetne pl. egy fetch/axios POST a backend felé...
+
+    // Clear fields + modal close
+    setCertifiedFormData({
+      organizerName: '',
+      companyName: '',
+      taxNumber: '',
+      companyRegisterNumber: '',
+      phoneNumber: '',
+      email: '',
+      address: '',
+      website: '',
+      shortDescription: '',
+      bankAccount: '',
+      idDocument: null,
+    });
+    setIsCertifiedModalOpen(false);
   };
 
   return (
     <>
-      {/* SPLASH SCREEN (3 lüktetés + lassú fade in) */}
+      {/* SPLASH SCREEN */}
       {showSplash && (
         <div className="splash-screen">
           <img
-            src="./kepek_jegyAppLogo(png).png"
+            src="./kepek_jegyzetek/AppLogo(png).png"
             alt="App Logo"
             className="splash-logo"
           />
         </div>
       )}
 
-      {/* FŐ TARTALOM (csak akkor látszik, ha a splash screen már eltűnt) */}
+      {/* FŐ TARTALOM */}
       <div
         className={`app-container ${showSplash ? 'hidden' : ''}`}
         onWheel={handleWheel}
@@ -149,12 +225,12 @@ const App: React.FC = () => {
           <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
             <li>
               <a href="#section1" onClick={() => setIsMenuOpen(false)}>
-                Szervezz Bulit
+                Főoldal
               </a>
             </li>
             <li>
-              <a href="#section2" onClick={() => setIsMenuOpen(false)}>
-                Eredmények
+              <a href="EventsPage.tsx" onClick={() => setIsMenuOpen(false)}>
+                Események
               </a>
             </li>
             <li>
@@ -163,7 +239,7 @@ const App: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="/certified" onClick={() => setIsMenuOpen(false)}>
+              <a href="#" onClick={openCertifiedModal}>
                 Hitelesített szervezői regisztráció
               </a>
             </li>
@@ -247,7 +323,7 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 2 – 3 kártya */}
+        {/* SECTION 2 */}
         <section id="section2">
           <div className="cards-container">
             <div className="card">
@@ -265,9 +341,10 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 3 – Bal oldalt form, jobb oldalt egy kép */}
+        {/* SECTION 3 */}
         <section id="section3">
           <div className="section3-content">
+            {/* Bal oldal - Buli létrehozása */}
             <div className="left-side">
               <h2>Hozz létre egy bulit!</h2>
               <p>Töltsd ki az alábbi űrlapot a buli részleteivel.</p>
@@ -365,20 +442,225 @@ const App: React.FC = () => {
               </form>
             </div>
 
+            {/* Jobb oldal - kép */}
             <div className="right-side">
               <img
                 src="src/telcsi.png"
                 alt="party-pic"
-                style={{
-                  maxWidth: '100%',
-                  height: 'auto',
-                  borderRadius: '8px',
-                }}
+                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
               />
             </div>
           </div>
         </section>
       </div>
+
+      {/* MODAL (Hitelesített Szervezői Regisztráció) */}
+      <AnimatePresence>
+        {isCertifiedModalOpen && (
+          <div className="modal-wrapper">
+            {/* Háttér (overlay) */}
+            <motion.div
+              className="modal-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            {/* RAGYOGÓ, PULZÁLÓ KERET A MODALON */}
+            <motion.div
+  className="modal-container"
+  initial={{
+    opacity: 0,
+    scale: 0.75,
+    // 0-ról induló fény
+    boxShadow: '0 0 0px 0px rgba(200, 65, 198, 0)',
+  }}
+  animate={{
+    opacity: 1,
+    scale: 1,
+    // Ráérősebb, sokkal gyengébb pulzálás
+    boxShadow: [
+      '0 0 0px 0px rgba(200, 65, 198, 0)',      // indul 0-ról
+      '0 0 6px 3px rgba(200, 65, 198, 0.2)',    // enyhén megnő
+      '0 0 10px 5px rgba(200, 65, 198, 0.3)',   // kicsit erősebb, de még visszafogott
+      '0 0 6px 3px rgba(200, 65, 198, 0.2)',    // visszaleng
+      '0 0 0px 0px rgba(200, 65, 198, 0)',      // visszatér 0-ra
+    ],
+    transition: {
+      duration: 1,         // Lassú, 4 mp-es kör
+   // Végtelen ismétlés
+      repeatType: 'reverse',
+      ease: 'easeInOut',
+    },
+  }}
+  exit={{
+    opacity: 0,
+    scale: 0.75,
+    boxShadow: '0 0 0px 0px rgba(200, 65, 198, 0)',
+  }}
+>
+              <div className="modal-header">
+                <h2>Hitelesített Szervezői Regisztráció</h2>
+                <button className="close-btn" onClick={closeCertifiedModal}>
+                  &times;
+                </button>
+              </div>
+
+              <form className="certified-form" onSubmit={handleCertifiedSubmit}>
+                <div className="form-group">
+                  <label htmlFor="organizerName">Szervező neve</label>
+                  <input
+                    type="text"
+                    id="organizerName"
+                    name="organizerName"
+                    placeholder="Teljes név"
+                    value={certifiedFormData.organizerName}
+                    onChange={handleCertifiedInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="companyName">Cég / Egyesület / Alapítvány</label>
+                  <input
+                    type="text"
+                    id="companyName"
+                    name="companyName"
+                    placeholder="Cég neve"
+                    value={certifiedFormData.companyName}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="taxNumber">Adószám</label>
+                  <input
+                    type="text"
+                    id="taxNumber"
+                    name="taxNumber"
+                    placeholder="Adószám (ha van)"
+                    value={certifiedFormData.taxNumber}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="companyRegisterNumber">Cégjegyzékszám</label>
+                  <input
+                    type="text"
+                    id="companyRegisterNumber"
+                    name="companyRegisterNumber"
+                    placeholder="12-34-567890"
+                    value={certifiedFormData.companyRegisterNumber}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="phoneNumber">Telefonszám</label>
+                  <input
+                    type="tel"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    placeholder="+36..."
+                    value={certifiedFormData.phoneNumber}
+                    onChange={handleCertifiedInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="email">E-mail</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="E-mail cím"
+                    value={certifiedFormData.email}
+                    onChange={handleCertifiedInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="address">Székhely / Lakcím</label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    placeholder="Irányítószám, Város, Utca, Házszám"
+                    value={certifiedFormData.address}
+                    onChange={handleCertifiedInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="website">Weboldal (ha van)</label>
+                  <input
+                    type="url"
+                    id="website"
+                    name="website"
+                    placeholder="https://"
+                    value={certifiedFormData.website}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="shortDescription">Rövid leírás (max. 500 karakter)</label>
+                  <textarea
+                    id="shortDescription"
+                    name="shortDescription"
+                    rows={3}
+                    maxLength={500}
+                    placeholder="Mesélj röviden a tevékenységedről..."
+                    value={certifiedFormData.shortDescription}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="bankAccount">Bankszámlaszám (opcionális)</label>
+                  <input
+                    type="text"
+                    id="bankAccount"
+                    name="bankAccount"
+                    placeholder="12345678-12345678-00000000"
+                    value={certifiedFormData.bankAccount}
+                    onChange={handleCertifiedInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="idDocument">Igazolvány / Dokumentum (PDF/JPG)</label>
+                  <input
+                    type="file"
+                    id="idDocument"
+                    name="idDocument"
+                    accept="application/pdf, image/*"
+                    onChange={handleFileChange}
+                  />
+                </div>
+
+                {/* Lebegő/pulzáló animáció a Küldés gombon HOVER-kor */}
+                <motion.button
+                  type="submit"
+                  className="btn submit-btn"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: '0 0 10px 4px rgba(168, 53, 162, 0.6)',
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Küldés
+                </motion.button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      <Footer />
     </>
   );
 };

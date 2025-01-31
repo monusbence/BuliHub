@@ -209,7 +209,7 @@ section {
 }
 
 .store-buttons .store-icon {
-  width: 200px;
+  width: 150px;
   height: auto;
 }
 
@@ -611,4 +611,122 @@ section {
     max-width: 80%;
     height: auto;
   }
+}
+
+/* MODAL WRAPPER - ÚJ */
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  /* Ha nem akarod, hogy a háttér scrollozható legyen,
+     akkor a body-n is beállíthatod: body { overflow: hidden; } 
+     amíg a modal nyitva van. */
+}
+
+/* MODAL Overlay */
+.modal-overlay {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+/* MODAL Container */
+.modal-container {
+  position: relative; 
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+
+  /* --- LÉNYEGES ÚJ SOROK: görgetés és magasság korlát --- */
+  max-height: 80vh;    /* A képernyő 80%-áig nyúlhat a modal */
+  overflow-y: auto;    /* Ha túl magas a tartalom, itt tudunk görgetni */
+  /* (opcionálisan iOS-hez) -webkit-overflow-scrolling: touch; */
+}
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #c841c6;
+}
+
+/* Certified form */
+.certified-form .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.certified-form .form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.certified-form .form-group input,
+.certified-form .form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #000;
+  font-size: 1rem;
+}
+
+.certified-form .form-group input:focus,
+.certified-form .form-group textarea:focus {
+  outline: none;
+  border-color: #a735a2;
+}
+
+.certified-form .btn.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #c841c6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.certified-form .btn.submit-btn:hover {
+  background-color: #a735a2;
 }
