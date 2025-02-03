@@ -46,7 +46,7 @@ const DUMMY_EVENTS: EventItem[] = [
   },
 ];
 
-const EventsPage: React.FC = () => {
+function EventsPage  ()  {
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
 
@@ -66,7 +66,7 @@ const EventsPage: React.FC = () => {
         <div className="sidebar-logo">
           {}
           <img
-            src="/kepek_jegyzetek/MainLogo.png"
+            src="/kepek_jegyzetek/MainLogo(png).png"
             alt="BuliHub Logo"
           />
         </div>
