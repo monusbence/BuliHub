@@ -1,4 +1,4 @@
-/* nullázás */
+
 *,
 *::before,
 *::after {
@@ -7,24 +7,24 @@
   box-sizing: border-box;
 }
 
-/* Alap betűkészlet, fehér háttér */
+
 body {
   background-color: #fff;
   font-family: Arial, sans-serif;
 }
 
-/* FŐKONTAINER */
+
 .register-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* NAVBAR */
+
 .navbar {
   width: 100%;
   height: 60px;
-  background-color: #000; /* feketés */
+  background-color: #000; 
   display: flex;
   align-items: center;
   padding: 0 2rem;
@@ -53,23 +53,20 @@ body {
   color: #0ff;
 }
 
-/* KÉT OSZLOP: BAL LOGÓ, JOBB FORM */
+
 .register-content {
   display: flex;
-  flex: 1;            /* kitölti a maradék helyet a navbar alatt */
+  flex: 1;            
   width: 100%;
   align-items: center; 
   padding: 2rem;
   gap: 2rem;
-  /* Ha fix max-szélességet akarsz a teljes tartalomnak:
-     max-width: 1400px;
-     margin: 0 auto; 
-  */
+  
 }
 
-/* BAL OSZLOP */
+
 .left-column {
-  width: 350px;  /* fix szélesség a logónak */
+  width: 350px;  
   display: flex;
   justify-content: center;
   align-items: center;
@@ -82,17 +79,17 @@ body {
   object-fit: contain;
 }
 
-/* JOBB OSZLOP - TÖLTSÖN KI MINDENT */
+
 .right-column {
-  flex: 1;  /* A jobb oldal kitölti a maradék helyet */
+  flex: 1;  
   display: flex;
   align-items: center;
 }
 
-/* A regisztrációs doboz */
+
 .register-box {
   width: 100%;
-  max-width: 400px; /* ha nem akarod túl szélesre engedni */
+  max-width: 400px; 
   margin: 0 auto;
   background: #f5f5f5;
   border-radius: 8px;
@@ -100,14 +97,14 @@ body {
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
 }
 
-/* Cím */
+
 .title {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: #000;
 }
 
-/* Hibák */
+
 .error-message {
   background-color: rgba(255, 0, 0, 0.1);
   color: #b00;
@@ -118,7 +115,7 @@ body {
   text-align: center;
 }
 
-/* FORM */
+
 .register-form {
   display: flex;
   flex-direction: column;
@@ -141,7 +138,7 @@ body {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  background-color: #000;    /* Példa: fekete input */
+  background-color: #000;    
   color: #fff;
 }
 
@@ -149,7 +146,7 @@ body {
   color: #aaa;
 }
 
-/* Gomb */
+
 .btn-submit {
   padding: 0.8rem;
   background-color: #c841c6;
@@ -165,7 +162,7 @@ body {
   background-color: #a735a2;
 }
 
-/* MOBILNÉZET (max 768px) */
+
 @media (max-width: 768px) {
   .register-content {
     flex-direction: column;

@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App'
 import RegisterPage from './RegisterPage'
-import EventsPage from './components/eventsPage.tsx' // Figyelj a pontos elérési útra és a nagybetűkre
+import EventsPage from './components/EventsPage.tsx' 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

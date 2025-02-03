@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Footer from './footer'; // importáld helyesen a Footer komponensed
-import './EventsPage.css';    // győződj meg róla, hogy ez a fájl is jó helyen van
+import Footer from './footer'; 
+import './EventsPage.css';    
 
 interface EventItem {
   id: number;
@@ -64,7 +64,7 @@ const EventsPage: React.FC = () => {
     <div className="events-page-container">
       <aside className="sidebar-nav">
         <div className="sidebar-logo">
-          {/* Használd inkább /kepek_jegyzetek/MainLogo.png, ha a public mappában van */}
+          {}
           <img
             src="/kepek_jegyzetek/MainLogo.png"
             alt="BuliHub Logo"

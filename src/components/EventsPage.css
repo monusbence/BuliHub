@@ -1,4 +1,4 @@
-/* Például a /src/components/EventsPage.css */
+
 
 * {
     box-sizing: border-box;
@@ -9,8 +9,8 @@
   .events-page-container {
     display: flex;
     min-height: 100vh;
-    background: #000; /* fekete háttér */
-    color: #fff;      /* fehér szöveg */
+    background: #000; 
+    color: #fff;      
   }
   
   .sidebar-nav {

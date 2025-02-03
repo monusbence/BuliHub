@@ -1,12 +1,12 @@
 import React from 'react';
-import './Footer.css'; // vagy App.css – attól függ, hova illeszted be a stílust
+import './Footer.css'; 
 
-const Footer: React.FC = () => {
+function Footer () {
   return (
     <footer className="footer">
-      {/* Felső sáv - 4 oszlop */}
+      
       <div className="footer-top">
-        {/* 1. oszlop: Logo és rövid bemutatkozó szöveg */}
+        {}
         <div className="footer-column">
           <img
             src="./kepek_jegyzetek/MainLogo(png).png"
@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
           </p>
         </div>
 
-        {/* 2. oszlop: Gyors linkek / menüpontok */}
+        
         <div className="footer-column">
           <h3>Menü</h3>
           <ul className="footer-links">
@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        {/* 3. oszlop: Elérhetőségek */}
+        
         <div className="footer-column">
           <h3>Elérhetőségek</h3>
           <p>Cím: 1234 Budapest, Példa utca 56.</p>
@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
           <p>E-mail: info@bulihub.hu</p>
         </div>
 
-        {/* 4. oszlop: Hírlevél feliratkozás */}
+        
         <div className="footer-column">
           <h3>Hírlevél</h3>
           <p>Iratkozz fel, hogy elsőként értesülj a legújabb bulikról!</p>
@@ -64,7 +64,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Alsó sáv - jogi információk, social ikonok stb. */}
+      
       <div className="footer-bottom">
         <p>
           &copy; {new Date().getFullYear()} BuliHub. Minden jog fenntartva.

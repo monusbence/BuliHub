@@ -1,17 +1,17 @@
-// RegisterPage.tsx
+
 
 import React, { useState } from 'react';
-import './App.css';  // vagy ha van külön CSS, importáld: import './RegisterPage.css';
+import './App.css';  
 
 const Register: React.FC = () => {
-  // --- NAVBAR ÁLLAPOT --- //
+ 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
-  // --- REGISZTRÁCIÓS FORM ÁLLAPOT --- //
+  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -35,7 +35,7 @@ const Register: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Alap jelszóellenőrzés
+    
     if (formData.password !== formData.confirmPassword) {
       alert('A két jelszó nem egyezik!');
       return;
@@ -49,7 +49,7 @@ const Register: React.FC = () => {
   return (
     <div className="app-container" style={{ overflow: 'auto' }}>
       
-      {/* NAVBAR (bemásolva az App.tsx-ből) */}
+     
       <nav className="navbar">
         <div className="logo">
           <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
@@ -87,7 +87,7 @@ const Register: React.FC = () => {
         </ul>
       </nav>
 
-      {/* FŐ TARTALOM: balra a logó, jobbra a form */}
+      
       <div
         className="register-content"
         style={{
@@ -95,7 +95,7 @@ const Register: React.FC = () => {
           minHeight: '100vh',
         }}
       >
-        {/* Bal oldal - AppLogo(png).png */}
+        
         <div
           className="left-column"
           style={{
@@ -113,7 +113,7 @@ const Register: React.FC = () => {
           />
         </div>
 
-        {/* Jobb oldal - regisztrációs form */}
+        
         <div
           className="right-column"
           style={{
@@ -138,7 +138,7 @@ const Register: React.FC = () => {
               Regisztráció
             </h2>
 
-            {/* Teljes név */}
+            
             <div style={{ marginBottom: '1rem' }}>
               <label
                 htmlFor="fullName"
@@ -163,7 +163,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Email */}
+            
             <div style={{ marginBottom: '1rem' }}>
               <label
                 htmlFor="email"
@@ -188,7 +188,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Jelszó */}
+            
             <div style={{ marginBottom: '1rem' }}>
               <label
                 htmlFor="password"
@@ -213,7 +213,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Jelszó megerősítése */}
+            
             <div style={{ marginBottom: '1.5rem' }}>
               <label
                 htmlFor="confirmPassword"
@@ -238,7 +238,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Születési dátum (date picker) */}
+            
             <div style={{ marginBottom: '1rem' }}>
               <label
                 htmlFor="birthDate"
@@ -262,7 +262,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Város */}
+           
             <div style={{ marginBottom: '1rem' }}>
               <label
                 htmlFor="city"
@@ -287,7 +287,7 @@ const Register: React.FC = () => {
               />
             </div>
 
-            {/* Nem (lenyíló lista) */}
+            
             <div style={{ marginBottom: '1.5rem' }}>
               <label
                 htmlFor="gender"

@@ -1,23 +1,19 @@
 .footer {
     width: 100%;
-    background-color: #111; /* Sötét háttér a felső részhez */
+    background-color: #111; 
     color: #fff;
     margin-top: 2rem;
     font-family: 'Arial', sans-serif;
   }
   
-  /* FELSŐ SÁV (többoszlopos) */
+  
   .footer-top {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 2rem;
   
-    /* Eltávolítjuk a max-width-et és a margin: 0 auto-t, hogy kifusson a teljes szélességben */
-    /* max-width: 1300px; */
-    /* margin: 0 auto; */
-  
-    /* Inkább valamennyi belső paddingot adunk balra és jobbra. */
+    
     padding: 2rem 5vw;
   }
   
@@ -46,7 +42,7 @@
     padding-bottom: 4px;
   }
   
-  /* Linklista (2. oszlop pl. gyorslinkekhez) */
+ 
   .footer-links {
     list-style: none;
     margin: 0;
@@ -68,13 +64,13 @@
     color: #fff;
   }
   
-  /* Elérhetőségek (3. oszlop) */
+  
   .footer-column p {
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
   }
   
-  /* Hírlevél (4. oszlop) */
+ 
   .newsletter-form {
     display: flex;
     flex-direction: column;
@@ -106,17 +102,13 @@
     background-color: #a735a2;
   }
   
-  /* ALSÓ SÁV (social ikonok, jogi információk) – FEHÉR háttér */
+  
   .footer-bottom {
-    background-color: #ffffff; /* Fehér háttér az alsó résznek */
-    color: #000;           /* Fekete szöveg a fehér alapon */
+    background-color: #ffffff; 
+    color: #000;           
     border-top: 1px solid #333;
   
-    /* Ugyanúgy nem használunk max-width és margin: 0 auto */
-    /* max-width: 1300px; */
-    /* margin: 0 auto; */
-  
-    /* Kis belső tér, hogy ne tapadjon szélhez */
+    
     padding: 1rem 5vw;
   
     display: flex;
@@ -130,7 +122,7 @@
     font-size: 0.9rem;
   }
   
-  /* Social ikonok */
+ 
   .footer-socials {
     display: flex;
     gap: 1rem;
@@ -153,12 +145,12 @@
     height: auto;
   }
   
-  /* RESZPONZÍV ALKALMAZKODÁS */
+  
   @media (max-width: 768px) {
     .footer-top {
       flex-direction: column;
       gap: 2rem;
-      /* Marad a padding, de lehet kisebb is, ha szeretnéd */
+      
       padding: 2rem 5vw;
     }
   

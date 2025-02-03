@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from './components/footer'; // vagy ahogy az útvonalad alakul
 import './App.css';
 
-const App: React.FC = () => {
+function App () {
   // SPLASH SCREEN ÁLLAPOT
   const [showSplash, setShowSplash] = useState(true);
 
@@ -229,7 +229,7 @@ const App: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="EventsPage.tsx" onClick={() => setIsMenuOpen(false)}>
+              <a href="/events" onClick={() => setIsMenuOpen(false)}>
                 Események
               </a>
             </li>
