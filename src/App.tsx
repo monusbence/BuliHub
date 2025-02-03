@@ -1,9 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from './components/footer'; // vagy ahogy az útvonalad alakul
+import Footer from './components/footer'; // A projekted struktúrája szerint módosítsd
 import './App.css';
 
-function App () {
+// Framer Motion variánsok a Section2 kártyáihoz – módosítva, hogy jobban menjenek szélre:
+const leftCardVariants = {
+  initial: { x: 0, opacity: 0 },
+  animate: { x: -350, opacity: 1, transition: { duration: 1 } },
+  exit: { x: 0, opacity: 0, transition: { duration: 1 } },
+};
+
+const rightCardVariants = {
+  initial: { x: 0, opacity: 0 },
+  animate: { x: 350, opacity: 1, transition: { duration: 1 } },
+  exit: { x: 0, opacity: 0, transition: { duration: 1 } },
+};
+
+const centerCardVariants = {
+  initial: { x: 0, opacity: 1 },
+  animate: { x: 0, opacity: 1 },
+};
+
+function App() {
   // SPLASH SCREEN ÁLLAPOT
   const [showSplash, setShowSplash] = useState(true);
 
@@ -14,7 +32,7 @@ function App () {
   // NAVBAR/HAMBURGER MENÜ
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-  // FELUGRÓ ABLAK (MODAL) ÁLLAPOT
+  // FELUGRÓ MODAL (hitelesített szervezői regisztráció)
   const [isCertifiedModalOpen, setIsCertifiedModalOpen] = useState<boolean>(false);
 
   // HITELSZERVEZŐ FORM STATE
@@ -32,7 +50,7 @@ function App () {
     idDocument: null as File | null,
   });
 
-  // Buli létrehozó FORM STATE
+  // BULI LÉTREHOZÓ FORM STATE
   const [formData, setFormData] = useState({
     partyName: '',
     date: '',
@@ -43,6 +61,10 @@ function App () {
     description: '',
   });
 
+  // SECTION2 kártyák állapota (expanded = kinyitva)
+  const [cardsExpanded, setCardsExpanded] = useState(false);
+  const section2Ref = useRef<HTMLDivElement>(null);
+
   // SPLASH SCREEN IDŐZÍTÉS (4 mp)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -51,7 +73,7 @@ function App () {
     return () => clearTimeout(timer);
   }, []);
 
-  // BODY SCROLL TILTÁSA (telefon forgatás) – Ha locked, ne lehessen görgetni
+  // BODY SCROLL TILTÁSA (ha locked van)
   useEffect(() => {
     document.body.style.overflow = locked ? 'hidden' : 'auto';
     return () => {
@@ -59,50 +81,42 @@ function App () {
     };
   }, [locked]);
 
-  // BODY SCROLL TILTÁSA A MODAL NYITÁSÁNÁL (opcionális plusz)
+  // MODAL NYITÁSÁNÁL is tiltjuk a scrollt
   useEffect(() => {
     if (isCertifiedModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      // Ha lezárás, visszaállítjuk
       document.body.style.overflow = locked ? 'hidden' : 'auto';
     }
   }, [isCertifiedModalOpen, locked]);
 
-  // GÖRGETÉS KEZELÉSE (Telefon forgatás)
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      const SCROLL_DISTANCE = 500;
-      const delta = e.deltaY;
+  // GÖRGETÉS KEZELÉSE (telefon forgatás)
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    const SCROLL_DISTANCE = 500;
+    const delta = e.deltaY;
 
-      if (locked) {
-        // Előreforgatás 0 -> 1
+    if (locked) {
+      e.preventDefault();
+      const newProgress = progress + delta / SCROLL_DISTANCE;
+      const clampedProgress = Math.max(0, Math.min(1, newProgress));
+      setProgress(clampedProgress);
+      if (clampedProgress >= 1) {
+        setLocked(false);
+      }
+    } else {
+      if (window.scrollY === 0 && delta < 0 && progress > 0) {
         e.preventDefault();
         const newProgress = progress + delta / SCROLL_DISTANCE;
         const clampedProgress = Math.max(0, Math.min(1, newProgress));
         setProgress(clampedProgress);
-
-        if (clampedProgress >= 1) {
-          setLocked(false);
-        }
-      } else {
-        // Visszaforgatás 1 -> 0 (ha a lap tetején vagyunk és felfelé görgetünk)
-        if (window.scrollY === 0 && delta < 0 && progress > 0) {
-          e.preventDefault();
-          const newProgress = progress + delta / SCROLL_DISTANCE;
-          const clampedProgress = Math.max(0, Math.min(1, newProgress));
-          setProgress(clampedProgress);
-
-          if (clampedProgress <= 0) {
-            setLocked(true);
-          }
+        if (clampedProgress <= 0) {
+          setLocked(true);
         }
       }
-    },
-    [locked, progress]
-  );
+    }
+  }, [locked, progress]);
 
-  // TELEFON FORGÁS SZÖGE
+  // TELEFON FORGATÁS SZÖG
   const startAngle = -15;
   const endAngle = 0;
   const rotateAngle = startAngle + (endAngle - startAngle) * progress;
@@ -112,13 +126,13 @@ function App () {
 
   // MODAL NYITÁS / ZÁRÁS
   const openCertifiedModal = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setIsMenuOpen(false);
     setIsCertifiedModalOpen(true);
   };
   const closeCertifiedModal = () => setIsCertifiedModalOpen(false);
 
-  // Buli létrehozó form kezelése
+  // BULI LÉTREHOZÓ FORM KEZELÉSE
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -128,7 +142,6 @@ function App () {
       [name]: value,
     }));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Buli adatok:', formData);
@@ -144,7 +157,7 @@ function App () {
     });
   };
 
-  // HITELSZERVEZŐ (CERTIFIED) FORM KEZELÉSE
+  // HITELSZERVEZŐ FORM KEZELÉSE
   const handleCertifiedInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -154,23 +167,19 @@ function App () {
       [name]: value,
     }));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    const file = e.target.files?.[0];
+    if (file) {
       setCertifiedFormData((prev) => ({
         ...prev,
-        idDocument: e.target.files![0],
+        idDocument: file,
       }));
     }
   };
-
   const handleCertifiedSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Hitelesített adatok:', certifiedFormData);
     alert('Köszönjük! A hitelesítés folyamatban van.');
-    // Itt jöhetne pl. egy fetch/axios POST a backend felé...
-
-    // Clear fields + modal close
     setCertifiedFormData({
       organizerName: '',
       companyName: '',
@@ -187,41 +196,65 @@ function App () {
     setIsCertifiedModalOpen(false);
   };
 
+  // SECTION2 megfigyelése az Intersection Observer segítségével:
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Ha a section2 legalább 50%-ban látható:
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            if (!cardsExpanded) {
+              setCardsExpanded(true);
+              // Eredetileg itt volt a scroll lock, de ha ez túl sokat szüneteltet, akkor kikommentezzük!
+              // document.body.style.overflow = 'hidden';
+              // setTimeout(() => {
+              //   document.body.style.overflow = 'auto';
+              // }, 300); // vagy kisebb idő (pl. 300ms) ha szükséges
+            }
+          } else {
+            if (cardsExpanded) {
+              setCardsExpanded(false);
+              // document.body.style.overflow = 'hidden';
+              // setTimeout(() => {
+              //   document.body.style.overflow = 'auto';
+              // }, 300);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    if (section2Ref.current) {
+      observer.observe(section2Ref.current);
+    }
+    return () => {
+      if (section2Ref.current) {
+        observer.unobserve(section2Ref.current);
+      }
+    };
+  }, [cardsExpanded]);
+
   return (
     <>
       {/* SPLASH SCREEN */}
       {showSplash && (
         <div className="splash-screen">
-          <img
-            src="./kepek_jegyzetek/AppLogo(png).png"
-            alt="App Logo"
-            className="splash-logo"
-          />
+          <img src="./kepek_jegyzetek/AppLogo(png).png" alt="App Logo" className="splash-logo" />
         </div>
       )}
 
       {/* FŐ TARTALOM */}
-      <div
-        className={`app-container ${showSplash ? 'hidden' : ''}`}
-        onWheel={handleWheel}
-      >
+      <div className={`app-container ${showSplash ? 'hidden' : ''}`} onWheel={handleWheel}>
         {/* NAVBAR */}
         <nav className="navbar">
           <div className="logo">
-            <img
-              src="./kepek_jegyzetek/MainLogo(png).png"
-              alt="BuliHub Logo"
-            />
+            <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
           </div>
-          <div
-            className={`hamburger ${isMenuOpen ? 'active' : ''}`}
-            onClick={toggleMenu}
-          >
+          <div className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
             <span></span>
             <span></span>
             <span></span>
           </div>
-
           <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
             <li>
               <a href="#section1" onClick={() => setIsMenuOpen(false)}>
@@ -234,7 +267,7 @@ function App () {
               </a>
             </li>
             <li>
-              <a href="#section3" onClick={() => setIsMenuOpen(false)}>
+              <a href="/contact" onClick={() => setIsMenuOpen(false)}>
                 Kapcsolat
               </a>
             </li>
@@ -252,20 +285,10 @@ function App () {
             <div className="text">
               <h1>Üdvözöllek a BuliHub oldalán!</h1>
               <div className="store-buttons">
-                <img
-                  src="./src/google-play.png"
-                  alt="Google Play"
-                  className="store-icon"
-                />
-                <img
-                  src="./src/app-storee.png"
-                  alt="App Store"
-                  className="store-icon"
-                />
+                <img src="./src/google-play.png" alt="Google Play" className="store-icon" />
+                <img src="./src/app-storee.png" alt="App Store" className="store-icon" />
               </div>
             </div>
-
-            {/* Telefon animáció */}
             <motion.div
               className="telokeret"
               animate={{ rotate: rotateAngle }}
@@ -278,40 +301,21 @@ function App () {
                 </div>
               </div>
               <div className="phone-screen">
-                <img
-                  src="./kepek_jegyzetek/MainLogo(png).png"
-                  alt="logo"
-                  className="logo-img"
-                />
+                <img src="./kepek_jegyzetek/MainLogo(png).png" alt="logo" className="logo-img" />
                 <h2 className="login-title">Bejelentkezés</h2>
-
                 <div className="input-group">
                   <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Add meg az e-mail címed"
-                  />
+                  <input type="email" id="email" placeholder="Add meg az e-mail címed" />
                 </div>
-
                 <div className="input-group">
                   <label htmlFor="password">Jelszó</label>
-                  <input
-                    type="password"
-                    id="password"
-                    placeholder="Add meg a jelszavad"
-                  />
+                  <input type="password" id="password" placeholder="Add meg a jelszavad" />
                 </div>
                 <button className="btn login-btn">Bejelentkezés</button>
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
-
-                <a
-                  href="/register"
-                  className="register-link"
-                  rel="noopener noreferrer"
-                >
+                <a href="/register" className="register-link" rel="noopener noreferrer">
                   Regisztrálj új fiókot
                 </a>
               </div>
@@ -323,31 +327,76 @@ function App () {
         </section>
 
         {/* SECTION 2 */}
-        <section id="section2">
-          <div className="cards-container">
-            <div className="card">
+        <section id="section2" ref={section2Ref}>
+          <div
+            className="cards-container"
+            style={{
+              position: 'relative',
+              height: '350px',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {/* Bal kártya: +200 */}
+            <motion.div
+              className="card left-card"
+              variants={leftCardVariants}
+              initial="initial"
+              animate={cardsExpanded ? 'animate' : 'initial'}
+              exit="exit"
+              style={{
+                position: 'absolute',
+                left: 'calc(50% - 150px)',
+                zIndex: 1,
+              }}
+            >
               <h2 className="gradient-number">+200</h2>
               <p>Meghirdetett esemény hetente</p>
-            </div>
-            <div className="card">
+            </motion.div>
+
+            {/* Középső kártya: +500 (mindig látszik) */}
+            <motion.div
+              className="card center-card"
+              variants={centerCardVariants}
+              initial="initial"
+              animate="animate"
+              style={{
+                position: 'absolute',
+                left: 'calc(50% - 150px)',
+                zIndex: 2,
+              }}
+            >
               <h2 className="gradient-number">+500</h2>
               <p>Ellenőrzött vélemény</p>
-            </div>
-            <div className="card">
+            </motion.div>
+
+            {/* Jobb kártya: +1000 */}
+            <motion.div
+              className="card right-card"
+              variants={rightCardVariants}
+              initial="initial"
+              animate={cardsExpanded ? 'animate' : 'initial'}
+              exit="exit"
+              style={{
+                position: 'absolute',
+                left: 'calc(50% - 150px)',
+                zIndex: 1,
+              }}
+            >
               <h2 className="gradient-number">+1000</h2>
               <p>Eladott jegyek hetente</p>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* SECTION 3 */}
         <section id="section3">
           <div className="section3-content">
-            {/* Bal oldal - Buli létrehozása */}
             <div className="left-side">
               <h2>Hozz létre egy bulit!</h2>
               <p>Töltsd ki az alábbi űrlapot a buli részleteivel.</p>
-
               <form className="party-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="partyName">Buli neve</label>
@@ -440,8 +489,6 @@ function App () {
                 </button>
               </form>
             </div>
-
-            {/* Jobb oldal - kép */}
             <div className="right-side">
               <img
                 src="src/telcsi.png"
@@ -457,54 +504,49 @@ function App () {
       <AnimatePresence>
         {isCertifiedModalOpen && (
           <div className="modal-wrapper">
-            {/* Háttér (overlay) */}
+            {/* Overlay */}
             <motion.div
               className="modal-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
-
-            {/* RAGYOGÓ, PULZÁLÓ KERET A MODALON */}
+            {/* Modal konténer pulzáló animációval */}
             <motion.div
-  className="modal-container"
-  initial={{
-    opacity: 0,
-    scale: 0.75,
-    // 0-ról induló fény
-    boxShadow: '0 0 0px 0px rgba(200, 65, 198, 0)',
-  }}
-  animate={{
-    opacity: 1,
-    scale: 1,
-    // Ráérősebb, sokkal gyengébb pulzálás
-    boxShadow: [
-      '0 0 0px 0px rgba(200, 65, 198, 0)',      // indul 0-ról
-      '0 0 6px 3px rgba(200, 65, 198, 0.2)',    // enyhén megnő
-      '0 0 10px 5px rgba(200, 65, 198, 0.3)',   // kicsit erősebb, de még visszafogott
-      '0 0 6px 3px rgba(200, 65, 198, 0.2)',    // visszaleng
-      '0 0 0px 0px rgba(200, 65, 198, 0)',      // visszatér 0-ra
-    ],
-    transition: {
-      duration: 1,         // Lassú, 4 mp-es kör
-   // Végtelen ismétlés
-      repeatType: 'reverse',
-      ease: 'easeInOut',
-    },
-  }}
-  exit={{
-    opacity: 0,
-    scale: 0.75,
-    boxShadow: '0 0 0px 0px rgba(200, 65, 198, 0)',
-  }}
->
+              className="modal-container"
+              initial={{
+                opacity: 0,
+                scale: 0.75,
+                boxShadow: '0 0 0px 0px rgba(200,65,198,0)',
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                boxShadow: [
+                  '0 0 0px 0px rgba(200,65,198,0)',
+                  '0 0 6px 3px rgba(200,65,198,0.2)',
+                  '0 0 10px 5px rgba(200,65,198,0.3)',
+                  '0 0 6px 3px rgba(200,65,198,0.2)',
+                  '0 0 0px 0px rgba(200,65,198,0)',
+                ],
+                transition: {
+                  duration: 1,
+                  repeatType: 'reverse',
+                  ease: 'easeInOut',
+                },
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.75,
+                boxShadow: '0 0 0px 0px rgba(200,65,198,0)',
+              }}
+            >
               <div className="modal-header">
                 <h2>Hitelesített Szervezői Regisztráció</h2>
                 <button className="close-btn" onClick={closeCertifiedModal}>
                   &times;
                 </button>
               </div>
-
               <form className="certified-form" onSubmit={handleCertifiedSubmit}>
                 <div className="form-group">
                   <label htmlFor="organizerName">Szervező neve</label>
@@ -518,7 +560,6 @@ function App () {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="companyName">Cég / Egyesület / Alapítvány</label>
                   <input
@@ -530,7 +571,6 @@ function App () {
                     onChange={handleCertifiedInputChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="taxNumber">Adószám</label>
                   <input
@@ -542,7 +582,6 @@ function App () {
                     onChange={handleCertifiedInputChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="companyRegisterNumber">Cégjegyzékszám</label>
                   <input
@@ -554,7 +593,6 @@ function App () {
                     onChange={handleCertifiedInputChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="phoneNumber">Telefonszám</label>
                   <input
@@ -567,7 +605,6 @@ function App () {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="email">E-mail</label>
                   <input
@@ -580,7 +617,6 @@ function App () {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="address">Székhely / Lakcím</label>
                   <input
@@ -593,7 +629,6 @@ function App () {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="website">Weboldal (ha van)</label>
                   <input
@@ -605,7 +640,6 @@ function App () {
                     onChange={handleCertifiedInputChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="shortDescription">Rövid leírás (max. 500 karakter)</label>
                   <textarea
@@ -616,9 +650,8 @@ function App () {
                     placeholder="Mesélj röviden a tevékenységedről..."
                     value={certifiedFormData.shortDescription}
                     onChange={handleCertifiedInputChange}
-                  />
+                  ></textarea>
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="bankAccount">Bankszámlaszám (opcionális)</label>
                   <input
@@ -630,7 +663,6 @@ function App () {
                     onChange={handleCertifiedInputChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="idDocument">Igazolvány / Dokumentum (PDF/JPG)</label>
                   <input
@@ -641,15 +673,10 @@ function App () {
                     onChange={handleFileChange}
                   />
                 </div>
-
-                {/* Lebegő/pulzáló animáció a Küldés gombon HOVER-kor */}
                 <motion.button
                   type="submit"
                   className="btn submit-btn"
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: '0 0 10px 4px rgba(168, 53, 162, 0.6)',
-                  }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 0 10px 4px rgba(168,53,162,0.6)' }}
                   whileTap={{ scale: 0.95 }}
                 >
                   Küldés
@@ -662,6 +689,6 @@ function App () {
       <Footer />
     </>
   );
-};
+}
 
 export default App;

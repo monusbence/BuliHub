@@ -6,6 +6,7 @@ import './index.css'
 import App from './App'
 import RegisterPage from './RegisterPage'
 import EventsPage from './components/EventsPage.tsx' 
+import ContactPage from './components/ContactPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
     <Route path="/" element={<App />} />
     <Route path="/register" element={<RegisterPage />} />
     <Route path="/events" element={<EventsPage />} />
+    <Route path="/contact" element={<ContactPage />} />
   </Routes>
 </BrowserRouter>
   </StrictMode>,

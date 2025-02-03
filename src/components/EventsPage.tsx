@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import Footer from './footer'; 
-import './EventsPage.css';    
+import React, { useState, useEffect } from 'react';
+import Footer from './footer';
+import './EventsPage.css';
 
 interface EventItem {
   id: number;
@@ -46,105 +46,140 @@ const DUMMY_EVENTS: EventItem[] = [
   },
 ];
 
-function EventsPage  ()  {
+function EventsPage() {
+  // Mobilnézet esetén alapból zárt legyen a navigáció
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
+
+  // Nyomon követjük az ablakméret változását, hogy szükség esetén frissítsük a nézetet
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      // Ha mobilra váltunk, alapból zárjuk a navigációt
+      if (mobile) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const filteredEvents = DUMMY_EVENTS.filter((event) => {
     const matchKeyword =
       event.title.toLowerCase().includes(keyword.toLowerCase()) ||
       event.location.toLowerCase().includes(keyword.toLowerCase());
-
     const matchCategory = category ? event.category === category : true;
-
     return matchKeyword && matchCategory;
   });
 
   return (
-    <div className="events-page-container">
-      <aside className="sidebar-nav">
-        <div className="sidebar-logo">
-          {}
-          <img
-            src="/kepek_jegyzetek/MainLogo(png).png"
-            alt="BuliHub Logo"
-          />
-        </div>
-        <nav>
-          <ul>
-            <li>
-              <a href="/">Főoldal</a>
-            </li>
-            <li>
-              <a href="/#section1">Szervezz Bulit</a>
-            </li>
-            <li>
-              <a href="/#section2">Rólunk</a>
-            </li>
-            <li>
-              <a href="/#section3">Kapcsolat</a>
-            </li>
-            <li>
-              <a href="/events" className="active">Események</a>
-            </li>
-          </ul>
-        </nav>
-      </aside>
-
-      <main className="events-main-content">
-        <h1>Események</h1>
-        <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
-
-        {/* Szűrősáv */}
-        <div className="filter-bar">
-          <input
-            type="text"
-            placeholder="Keresés cím vagy helyszín alapján..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+    <div className="page-container">
+      <div className="content-wrapper">
+        <aside className={`sidebar-nav ${isSidebarOpen ? 'open' : 'closed'}`}>
+          <div className="sidebar-content">
+            <div className="sidebar-logo">
+              <img
+                src="/kepek_jegyzetek/MainLogo(png).png"
+                alt="BuliHub Logo"
+              />
+            </div>
+            <nav>
+              <ul>
+                <li>
+                  <a href="/">Főoldal</a>
+                </li>
+                <li>
+                  <a href="/#section1">Szervezz Bulit</a>
+                </li>
+                <li>
+                  <a href="/#section2">Rólunk</a>
+                </li>
+                <li>
+                  <a href="/#section3">Kapcsolat</a>
+                </li>
+                <li>
+                  <a href="/events" className="active">
+                    Események
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          {/* A gomb tartalma: mobilon hamburger ikon, asztali nézetben nyíl */}
+          <button
+            className="sidebar-toggle"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            aria-label="Navigációs sáv nyitása/csukása"
           >
-            <option value="">Minden kategória</option>
-            <option value="Koncert">Koncert</option>
-            <option value="Party">Party</option>
-            <option value="Fesztivál">Fesztivál</option>
-            <option value="Konferencia">Konferencia</option>
-          </select>
-        </div>
+            {isMobile ? (
+              <span className="hamburger-icon"></span>
+            ) : (
+              isSidebarOpen ? '←' : '→'
+            )}
+          </button>
+        </aside>
 
-        {/* Eseménykártyák */}
-        <div className="events-grid">
-          {filteredEvents.length === 0 ? (
-            <p>Nincs megjeleníthető esemény a szűrésnek megfelelően.</p>
-          ) : (
-            filteredEvents.map((event) => (
-              <div className="event-card" key={event.id}>
-                <img src={event.imageUrl} alt={event.title} />
-                <div className="event-card-content">
-                  <h3>{event.title}</h3>
-                  <p>
-                    <strong>Dátum:</strong> {event.date}
-                  </p>
-                  <p>
-                    <strong>Helyszín:</strong> {event.location}
-                  </p>
-                  <p>
-                    <strong>Kategória:</strong> {event.category}
-                  </p>
-                  <button className="btn-details">Részletek</button>
+        <main className="events-main-content">
+          <h1>Események</h1>
+          <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
+
+          {/* Szűrősáv */}
+          <div className="filter-bar">
+            <input
+              type="text"
+              placeholder="Keresés cím vagy helyszín alapján..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="">Minden kategória</option>
+              <option value="Koncert">Koncert</option>
+              <option value="Party">Party</option>
+              <option value="Fesztivál">Fesztivál</option>
+              <option value="Konferencia">Konferencia</option>
+            </select>
+          </div>
+
+          {/* Eseménykártyák */}
+          <div className="events-grid">
+            {filteredEvents.length === 0 ? (
+              <p>Nincs megjeleníthető esemény a szűrésnek megfelelően.</p>
+            ) : (
+              filteredEvents.map((event) => (
+                <div className="event-card" key={event.id}>
+                  <img src={event.imageUrl} alt={event.title} />
+                  <div className="event-card-content">
+                    <h3>{event.title}</h3>
+                    <p>
+                      <strong>Dátum:</strong> {event.date}
+                    </p>
+                    <p>
+                      <strong>Helyszín:</strong> {event.location}
+                    </p>
+                    <p>
+                      <strong>Kategória:</strong> {event.category}
+                    </p>
+                    <button className="btn-details">Részletek</button>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      </main>
-
+              ))
+            )}
+          </div>
+        </main>
+      </div>
       <Footer />
     </div>
   );
-};
+}
 
 export default EventsPage;
