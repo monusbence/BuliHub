@@ -47,13 +47,25 @@ const DUMMY_EVENTS: EventItem[] = [
 ];
 
 function EventsPage() {
-  // Mobilnézet esetén alapból zárt legyen a navigáció
+  // Preloader állapota
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Mobilnézet esetén alapból zárt legyen a navigáció (asztali nézeten nyitva)
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
 
   // Nyomon követjük az ablakméret változását, hogy szükség esetén frissítsük a nézetet
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    // Szimulált betöltési idő (1 másodperc), mielőtt az oldal megjelenik
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -79,16 +91,22 @@ function EventsPage() {
     return matchKeyword && matchCategory;
   });
 
+  // Amíg a preloader aktív, csak azt jelenítjük meg
+  if (isLoading) {
+    return (
+      <div className="preloader">
+        <div className="loading-bar"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="content-wrapper">
         <aside className={`sidebar-nav ${isSidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-content">
             <div className="sidebar-logo">
-              <img
-                src="/kepek_jegyzetek/MainLogo(png).png"
-                alt="BuliHub Logo"
-              />
+              <img src="/kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
             </div>
             <nav>
               <ul>
