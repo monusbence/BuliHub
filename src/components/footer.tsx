@@ -41,8 +41,8 @@ function Footer () {
         
         <div className="footer-column">
           <h3>Elérhetőségek</h3>
-          <p>Cím: 1234 Budapest, Példa utca 56.</p>
-          <p>Telefon: +36 1 234 5678</p>
+          <p>Cím: 4032 Debrecen, Cívis utca 3.</p>
+          <p>Telefon: +36 30 332 9083</p>
           <p>E-mail: info@bulihub.hu</p>
         </div>
 
@@ -63,17 +63,17 @@ function Footer () {
           </form>
         </div>
       </div>
-
+      
       
       <div className="footer-bottom">
         <p>
           &copy; {new Date().getFullYear()} BuliHub. Minden jog fenntartva.
         </p>
         <div className="footer-socials">
-          <a href="https://facebook.com" target="_blank" rel="noreferrer">
+          <a href="https://www.facebook.com/profile.php?id=61572704108154&sk=about" target="_blank" rel="noreferrer">
             <img src="./kepek_jegyzetek/face.png" alt="Facebook" />
           </a>
-          <a href="https://instagram.com" target="_blank" rel="noreferrer">
+          <a href="https://www.instagram.com/bulihub/" target="_blank" rel="noreferrer">
             <img src="./kepek_jegyzetek/insta.png" alt="Instagram" />
           </a>
           <a href="https://twitter.com" target="_blank" rel="noreferrer">
