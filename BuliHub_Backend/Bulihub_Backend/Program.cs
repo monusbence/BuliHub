@@ -18,6 +18,18 @@ builder.Services.AddDbContext<BuliHubDbContext>(options =>
         ServerVersion.AutoDetect(connectionString));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")  // A frontend URL-je
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+
 // 3) ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -45,11 +57,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Használjuk a CORS middleware-t a beállított policy-val:
+app.UseCors("AllowFrontend");
+
 // Identity pipeline
 app.UseHttpsRedirection();
-app.UseAuthentication();   // Fontos a belépés/hozzáférés vezérléséhez
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

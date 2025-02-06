@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj": {}
+    "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj": {}
   },
   "projects": {
-    "C:\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj": {
+    "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
+        "projectUniqueName": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
         "projectName": "Bulihub_Backend",
-        "projectPath": "C:\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
-        "packagesPath": "C:\\Users\\Bloody\\.nuget\\packages\\",
-        "outputPath": "C:\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\obj\\",
+        "projectPath": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
+        "packagesPath": "C:\\Users\\kricsfalusi.david\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Bloody\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kricsfalusi.david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

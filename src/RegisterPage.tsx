@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import './App.css';  
 
@@ -11,7 +9,6 @@ const Register: React.FC = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
-  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -32,18 +29,40 @@ const Register: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    
     if (formData.password !== formData.confirmPassword) {
       alert('A két jelszó nem egyezik!');
       return;
     }
 
-    // Ide jöhet API-hívás vagy egyéb logika
-    console.log('Regisztrációs adatok:', formData);
-    alert('Sikeres regisztráció!');
+    // Készítjük el a backend által elvárt regisztrációs adatokat
+    const registerData = {
+      email: formData.email,
+      password: formData.password,
+      birthDate: formData.birthDate, // Ügyelj arra, hogy a formátum megfeleljen a backend elvárásainak
+      gender: formData.gender === 'férfi', // Példa: 'férfi' esetén true, egyébként false
+      name: formData.fullName,
+    };
+
+    try {
+      const response = await fetch('https://localhost:7248/api/Auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registerData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Regisztráció sikertelen: ' + JSON.stringify(errorData));
+      } else {
+        alert('Sikeres regisztráció!');
+      }
+    } catch (error) {
+      console.error('Hiba a regisztráció során:', error);
+      alert('Hiba történt a regisztráció során');
+    }
   };
 
   return (
@@ -352,3 +371,4 @@ const Register: React.FC = () => {
 };
 
 export default Register;
+

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from './components/footer'; // A projekted struktúrája szerint módosítsd
+import Footer from './components/footer';
 import './App.css';
 
-// Framer Motion variánsok a Section2 kártyáihoz – módosítva, hogy jobban menjenek szélre:
+// Framer Motion variánsok a Section2 kártyáihoz
 const leftCardVariants = {
   initial: { x: 0, opacity: 0 },
   animate: { x: -350, opacity: 1, transition: { duration: 1 } },
@@ -61,7 +61,11 @@ function App() {
     description: '',
   });
 
-  // SECTION2 kártyák állapota (expanded = kinyitva)
+  // STATE a bejelentkezéshez
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // SECTION2 kártyák állapota
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const section2Ref = useRef<HTMLDivElement>(null);
 
@@ -201,23 +205,13 @@ function App() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Ha a section2 legalább 50%-ban látható:
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
             if (!cardsExpanded) {
               setCardsExpanded(true);
-              // Eredetileg itt volt a scroll lock, de ha ez túl sokat szüneteltet, akkor kikommentezzük!
-              // document.body.style.overflow = 'hidden';
-              // setTimeout(() => {
-              //   document.body.style.overflow = 'auto';
-              // }, 300); // vagy kisebb idő (pl. 300ms) ha szükséges
             }
           } else {
             if (cardsExpanded) {
               setCardsExpanded(false);
-              // document.body.style.overflow = 'hidden';
-              // setTimeout(() => {
-              //   document.body.style.overflow = 'auto';
-              // }, 300);
             }
           }
         });
@@ -234,18 +228,40 @@ function App() {
     };
   }, [cardsExpanded]);
 
+  // BEJELENTKEZÉS HANDLER
+  const handleLogin = async () => {
+    const loginData = {
+      email: loginEmail,
+      password: loginPassword,
+    };
+
+    try {
+      const response = await fetch('https://localhost:7248/api/Auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginData),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert('Bejelentkezés sikertelen: ' + errorText);
+      } else {
+        alert('Bejelentkezés sikeres!');
+      }
+    } catch (error) {
+      console.error('Hiba a bejelentkezés során:', error);
+      alert('Hiba történt a bejelentkezés során');
+    }
+  };
+
   return (
     <>
-      {/* SPLASH SCREEN */}
       {showSplash && (
         <div className="splash-screen">
           <img src="./kepek_jegyzetek/AppLogo(png).png" alt="App Logo" className="splash-logo" />
         </div>
       )}
 
-      {/* FŐ TARTALOM */}
       <div className={`app-container ${showSplash ? 'hidden' : ''}`} onWheel={handleWheel}>
-        {/* NAVBAR */}
         <nav className="navbar">
           <div className="logo">
             <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
@@ -279,7 +295,6 @@ function App() {
           </ul>
         </nav>
 
-        {/* SECTION 1 */}
         <section id="section1">
           <div className="section1-content">
             <div className="text">
@@ -305,13 +320,25 @@ function App() {
                 <h2 className="login-title">Bejelentkezés</h2>
                 <div className="input-group">
                   <label htmlFor="email">Email</label>
-                  <input type="email" id="email" placeholder="Add meg az e-mail címed" />
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Add meg az e-mail címed"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                  />
                 </div>
                 <div className="input-group">
                   <label htmlFor="password">Jelszó</label>
-                  <input type="password" id="password" placeholder="Add meg a jelszavad" />
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Add meg a jelszavad"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                  />
                 </div>
-                <button className="btn login-btn">Bejelentkezés</button>
+                <button className="btn login-btn" onClick={handleLogin}>Bejelentkezés</button>
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
@@ -326,64 +353,37 @@ function App() {
           </div>
         </section>
 
-        {/* SECTION 2 */}
+        {/* ... A többi szekció változatlan marad ... */}
         <section id="section2" ref={section2Ref}>
-          <div
-            className="cards-container"
-            style={{
-              position: 'relative',
-              height: '350px',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {/* Bal kártya: +200 */}
+          <div className="cards-container" style={{ position: 'relative', height: '350px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <motion.div
               className="card left-card"
               variants={leftCardVariants}
               initial="initial"
               animate={cardsExpanded ? 'animate' : 'initial'}
               exit="exit"
-              style={{
-                position: 'absolute',
-                left: 'calc(50% - 150px)',
-                zIndex: 1,
-              }}
+              style={{ position: 'absolute', left: 'calc(50% - 150px)', zIndex: 1 }}
             >
               <h2 className="gradient-number">+200</h2>
               <p>Meghirdetett esemény hetente</p>
             </motion.div>
-
-            {/* Középső kártya: +500 (mindig látszik) */}
             <motion.div
               className="card center-card"
               variants={centerCardVariants}
               initial="initial"
               animate="animate"
-              style={{
-                position: 'absolute',
-                left: 'calc(50% - 150px)',
-                zIndex: 2,
-              }}
+              style={{ position: 'absolute', left: 'calc(50% - 150px)', zIndex: 2 }}
             >
               <h2 className="gradient-number">+500</h2>
               <p>Ellenőrzött vélemény</p>
             </motion.div>
-
-            {/* Jobb kártya: +1000 */}
             <motion.div
               className="card right-card"
               variants={rightCardVariants}
               initial="initial"
               animate={cardsExpanded ? 'animate' : 'initial'}
               exit="exit"
-              style={{
-                position: 'absolute',
-                left: 'calc(50% - 150px)',
-                zIndex: 1,
-              }}
+              style={{ position: 'absolute', left: 'calc(50% - 150px)', zIndex: 1 }}
             >
               <h2 className="gradient-number">+1000</h2>
               <p>Eladott jegyek hetente</p>
@@ -391,7 +391,6 @@ function App() {
           </div>
         </section>
 
-        {/* SECTION 3 */}
         <section id="section3">
           <div className="section3-content">
             <div className="left-side">
@@ -400,72 +399,27 @@ function App() {
               <form className="party-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="partyName">Buli neve</label>
-                  <input
-                    type="text"
-                    id="partyName"
-                    name="partyName"
-                    placeholder="Add meg a buli nevét"
-                    value={formData.partyName}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="text" id="partyName" name="partyName" placeholder="Add meg a buli nevét" value={formData.partyName} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="date">Dátum</label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="time">Időpont</label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    value={formData.time}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="time" id="time" name="time" value={formData.time} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="location">Helyszín</label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    placeholder="Add meg a helyszínt"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="text" id="location" name="location" placeholder="Add meg a helyszínt" value={formData.location} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="guests">Vendégek száma</label>
-                  <input
-                    type="number"
-                    id="guests"
-                    name="guests"
-                    min="1"
-                    placeholder="Hány vendéget vársz?"
-                    value={formData.guests}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="number" id="guests" name="guests" min="1" placeholder="Hány vendéget vársz?" value={formData.guests} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="theme">Téma</label>
-                  <select
-                    id="theme"
-                    name="theme"
-                    value={formData.theme}
-                    onChange={handleInputChange}
-                    required
-                  >
+                  <select id="theme" name="theme" value={formData.theme} onChange={handleInputChange} required>
                     <option value="">Válassz egy témát</option>
                     <option value="retro">Retro</option>
                     <option value="techno">Techno</option>
@@ -475,210 +429,73 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label htmlFor="description">Leírás</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={4}
-                    placeholder="Írj egy rövid leírást a buliról..."
-                    value={formData.description}
-                    onChange={handleInputChange}
-                  ></textarea>
+                  <textarea id="description" name="description" rows={4} placeholder="Írj egy rövid leírást a buliról..." value={formData.description} onChange={handleInputChange}></textarea>
                 </div>
-                <button type="submit" className="btn submit-btn">
-                  Buli létrehozása
-                </button>
+                <button type="submit" className="btn submit-btn">Buli létrehozása</button>
               </form>
             </div>
             <div className="right-side">
-              <img
-                src="src/telcsi.png"
-                alt="party-pic"
-                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-              />
+              <img src="src/telcsi.png" alt="party-pic" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
             </div>
           </div>
         </section>
       </div>
 
-      {/* MODAL (Hitelesített Szervezői Regisztráció) */}
       <AnimatePresence>
         {isCertifiedModalOpen && (
           <div className="modal-wrapper">
-            {/* Overlay */}
-            <motion.div
-              className="modal-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            {/* Modal konténer pulzáló animációval */}
-            <motion.div
-              className="modal-container"
-              initial={{
-                opacity: 0,
-                scale: 0.75,
-                boxShadow: '0 0 0px 0px rgba(200,65,198,0)',
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                boxShadow: [
-                  '0 0 0px 0px rgba(200,65,198,0)',
-                  '0 0 6px 3px rgba(200,65,198,0.2)',
-                  '0 0 10px 5px rgba(200,65,198,0.3)',
-                  '0 0 6px 3px rgba(200,65,198,0.2)',
-                  '0 0 0px 0px rgba(200,65,198,0)',
-                ],
-                transition: {
-                  duration: 1,
-                  repeatType: 'reverse',
-                  ease: 'easeInOut',
-                },
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.75,
-                boxShadow: '0 0 0px 0px rgba(200,65,198,0)',
-              }}
-            >
+            <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+            <motion.div className="modal-container" initial={{ opacity: 0, scale: 0.75, boxShadow: '0 0 0px 0px rgba(200,65,198,0)' }} animate={{ opacity: 1, scale: 1, boxShadow: [ '0 0 0px 0px rgba(200,65,198,0)', '0 0 6px 3px rgba(200,65,198,0.2)', '0 0 10px 5px rgba(200,65,198,0.3)', '0 0 6px 3px rgba(200,65,198,0.2)', '0 0 0px 0px rgba(200,65,198,0)' ], transition: { duration: 1, repeatType: 'reverse', ease: 'easeInOut' } }} exit={{ opacity: 0, scale: 0.75, boxShadow: '0 0 0px 0px rgba(200,65,198,0)' }}>
               <div className="modal-header">
                 <h2>Hitelesített Szervezői Regisztráció</h2>
-                <button className="close-btn" onClick={closeCertifiedModal}>
-                  &times;
-                </button>
+                <button className="close-btn" onClick={closeCertifiedModal}>&times;</button>
               </div>
               <form className="certified-form" onSubmit={handleCertifiedSubmit}>
                 <div className="form-group">
                   <label htmlFor="organizerName">Szervező neve</label>
-                  <input
-                    type="text"
-                    id="organizerName"
-                    name="organizerName"
-                    placeholder="Teljes név"
-                    value={certifiedFormData.organizerName}
-                    onChange={handleCertifiedInputChange}
-                    required
-                  />
+                  <input type="text" id="organizerName" name="organizerName" placeholder="Teljes név" value={certifiedFormData.organizerName} onChange={handleCertifiedInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="companyName">Cég / Egyesület / Alapítvány</label>
-                  <input
-                    type="text"
-                    id="companyName"
-                    name="companyName"
-                    placeholder="Cég neve"
-                    value={certifiedFormData.companyName}
-                    onChange={handleCertifiedInputChange}
-                  />
+                  <input type="text" id="companyName" name="companyName" placeholder="Cég neve" value={certifiedFormData.companyName} onChange={handleCertifiedInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="taxNumber">Adószám</label>
-                  <input
-                    type="text"
-                    id="taxNumber"
-                    name="taxNumber"
-                    placeholder="Adószám (ha van)"
-                    value={certifiedFormData.taxNumber}
-                    onChange={handleCertifiedInputChange}
-                  />
+                  <input type="text" id="taxNumber" name="taxNumber" placeholder="Adószám (ha van)" value={certifiedFormData.taxNumber} onChange={handleCertifiedInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="companyRegisterNumber">Cégjegyzékszám</label>
-                  <input
-                    type="text"
-                    id="companyRegisterNumber"
-                    name="companyRegisterNumber"
-                    placeholder="12-34-567890"
-                    value={certifiedFormData.companyRegisterNumber}
-                    onChange={handleCertifiedInputChange}
-                  />
+                  <input type="text" id="companyRegisterNumber" name="companyRegisterNumber" placeholder="12-34-567890" value={certifiedFormData.companyRegisterNumber} onChange={handleCertifiedInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="phoneNumber">Telefonszám</label>
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    placeholder="+36..."
-                    value={certifiedFormData.phoneNumber}
-                    onChange={handleCertifiedInputChange}
-                    required
-                  />
+                  <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="+36..." value={certifiedFormData.phoneNumber} onChange={handleCertifiedInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="email">E-mail</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="E-mail cím"
-                    value={certifiedFormData.email}
-                    onChange={handleCertifiedInputChange}
-                    required
-                  />
+                  <input type="email" id="email" name="email" placeholder="E-mail cím" value={certifiedFormData.email} onChange={handleCertifiedInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="address">Székhely / Lakcím</label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    placeholder="Irányítószám, Város, Utca, Házszám"
-                    value={certifiedFormData.address}
-                    onChange={handleCertifiedInputChange}
-                    required
-                  />
+                  <input type="text" id="address" name="address" placeholder="Irányítószám, Város, Utca, Házszám" value={certifiedFormData.address} onChange={handleCertifiedInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="website">Weboldal (ha van)</label>
-                  <input
-                    type="url"
-                    id="website"
-                    name="website"
-                    placeholder="https://"
-                    value={certifiedFormData.website}
-                    onChange={handleCertifiedInputChange}
-                  />
+                  <input type="url" id="website" name="website" placeholder="https://" value={certifiedFormData.website} onChange={handleCertifiedInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="shortDescription">Rövid leírás (max. 500 karakter)</label>
-                  <textarea
-                    id="shortDescription"
-                    name="shortDescription"
-                    rows={3}
-                    maxLength={500}
-                    placeholder="Mesélj röviden a tevékenységedről..."
-                    value={certifiedFormData.shortDescription}
-                    onChange={handleCertifiedInputChange}
-                  ></textarea>
+                  <textarea id="shortDescription" name="shortDescription" rows={3} maxLength={500} placeholder="Mesélj röviden a tevékenységedről..." value={certifiedFormData.shortDescription} onChange={handleCertifiedInputChange}></textarea>
                 </div>
                 <div className="form-group">
                   <label htmlFor="bankAccount">Bankszámlaszám (opcionális)</label>
-                  <input
-                    type="text"
-                    id="bankAccount"
-                    name="bankAccount"
-                    placeholder="12345678-12345678-00000000"
-                    value={certifiedFormData.bankAccount}
-                    onChange={handleCertifiedInputChange}
-                  />
+                  <input type="text" id="bankAccount" name="bankAccount" placeholder="12345678-12345678-00000000" value={certifiedFormData.bankAccount} onChange={handleCertifiedInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="idDocument">Igazolvány / Dokumentum (PDF/JPG)</label>
-                  <input
-                    type="file"
-                    id="idDocument"
-                    name="idDocument"
-                    accept="application/pdf, image/*"
-                    onChange={handleFileChange}
-                  />
+                  <input type="file" id="idDocument" name="idDocument" accept="application/pdf, image/*" onChange={handleFileChange} />
                 </div>
-                <motion.button
-                  type="submit"
-                  className="btn submit-btn"
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 10px 4px rgba(168,53,162,0.6)' }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <motion.button type="submit" className="btn submit-btn" whileHover={{ scale: 1.05, boxShadow: '0 0 10px 4px rgba(168,53,162,0.6)' }} whileTap={{ scale: 0.95 }}>
                   Küldés
                 </motion.button>
               </form>
@@ -692,3 +509,4 @@ function App() {
 }
 
 export default App;
+

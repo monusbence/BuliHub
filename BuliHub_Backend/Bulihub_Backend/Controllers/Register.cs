@@ -1,5 +1,4 @@
-﻿// Controllers/AuthController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Bulihub_Backend.Models;
 
@@ -27,14 +26,15 @@ namespace BuliHub_Backend.Controllers
             var newUser = new ApplicationUser
             {
                 Email = model.Email,
-                UserName = model.Email, // Identity-ben a UserName is kitöltendő
+                UserName = model.Email, // Az Identity-ben a UserName is kötelező
                 BirthDate = model.BirthDate,
-                Gender = model.Gender,
-                Name = model.Name,
-                Status = "Active" // Példa mező
+                Gender = model.Gender, // Már bool típusú érték
+                Name = model.FullName,
+                // Mivel az ApplicationUser nem tartalmaz külön City tulajdonságot,
+                // itt a Status mezőbe illesztjük a város információt.
+                Status = $"Active; City: {model.City}"
             };
 
-            // Létrehozzuk a usert a jelszóval
             var result = await _userManager.CreateAsync(newUser, model.Password);
             if (!result.Succeeded)
             {
@@ -69,11 +69,12 @@ namespace BuliHub_Backend.Controllers
     // DTO-k
     public class RegisterDto
     {
+        public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public DateTime? BirthDate { get; set; }
-        public bool Gender { get; set; }
-        public string? Name { get; set; }
+        public string City { get; set; } = string.Empty;
+        public bool Gender { get; set; }  // bool típusú érték, ahogy a formból érkezik
     }
 
     public class LoginDto
@@ -82,4 +83,5 @@ namespace BuliHub_Backend.Controllers
         public string Password { get; set; } = string.Empty;
     }
 }
+
 
