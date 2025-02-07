@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|c:\\users\\kricsfalusi.david\\desktop\\bulihub\\bulihub\\bulihub_backend\\bulihub_backend\\controllers\\register.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|solutionrelative:bulihub_backend\\controllers\\register.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|c:\\users\\kricsfalusi.david\\desktop\\bulihub\\bulihub\\bulihub_backend\\bulihub_backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|solutionrelative:bulihub_backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|c:\\users\\kricsfalusi.david\\desktop\\bulihub\\bulihub\\bulihub_backend\\bulihub_backend\\controllers\\register.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|solutionrelative:bulihub_backend\\controllers\\register.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D11F970D-4D5F-419F-8E9C-82769E974DCE}|Bulihub_Backend\\Bulihub_Backend.csproj|c:\\users\\kricsfalusi.david\\desktop\\bulihub\\bulihub\\bulihub_backend\\bulihub_backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -37,20 +37,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Register.cs",
               "DocumentMoniker": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Controllers\\Register.cs",
               "RelativeDocumentMoniker": "Bulihub_Backend\\Controllers\\Register.cs",
               "ToolTip": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Controllers\\Register.cs",
               "RelativeToolTip": "Bulihub_Backend\\Controllers\\Register.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACoAAAAAAAAAAAAowFUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-06T08:59:34.244Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-06T08:59:34.244Z"
             },
             {
               "$type": "Document",
@@ -74,8 +73,7 @@
               "RelativeToolTip": "Bulihub_Backend\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-01-25T15:41:57.655Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-25T15:41:57.655Z"
             },
             {
               "$type": "Document",
@@ -87,8 +85,7 @@
               "RelativeToolTip": "Bulihub_Backend\\Data\\BuliHubDbContext.cs",
               "ViewState": "AgIAACAAAAAAAAAAAAAAACkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-25T15:39:02.342Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-25T15:39:02.342Z"
             },
             {
               "$type": "Document",
@@ -111,12 +108,11 @@
               "RelativeToolTip": "Bulihub_Backend\\Models\\ApplicationUser.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-25T15:38:40.29Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-25T15:38:40.29Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Program.cs",
               "RelativeDocumentMoniker": "Bulihub_Backend\\Program.cs",

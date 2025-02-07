@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sCBRSteCF7M=",
+  "dgSpecHash": "UNY/MdmRKO0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\kricsfalusi.david\\Desktop\\Bulihub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
+  "projectFilePath": "C:\\Users\\kricsfalusi.david\\Desktop\\BuliHub\\BuliHub\\BuliHub_Backend\\Bulihub_Backend\\Bulihub_Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kricsfalusi.david\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\kricsfalusi.david\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
