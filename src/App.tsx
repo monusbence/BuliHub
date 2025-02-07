@@ -45,7 +45,7 @@ function App() {
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 1) SIMA REGISZTRÁCIÓS ŰRLAP
+  // 1) SIMA REGISZTRÁCIÓS ŰRLAP (Backend integráció)
   // ─────────────────────────────────────────────────────────────
   const [basicFormData, setBasicFormData] = useState({
     fullName: '',
@@ -65,13 +65,44 @@ function App() {
     }));
   };
 
-  const handleBasicSubmit = (e: React.FormEvent) => {
+  const handleBasicSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Alap regisztráció adatok:', basicFormData);
-    // Itt lehetne jelszó-megerősítés ellenőrzés is
-    // (pl.: if (basicFormData.password !== basicFormData.confirmPassword) { ... })
-    alert('Alap regisztráció sikeres!');
-    // Itt jöhet API-hívás, validálás, stb.
+
+    // Jelszó egyezés ellenőrzés
+    if (basicFormData.password !== basicFormData.confirmPassword) {
+      alert('A két jelszó nem egyezik!');
+      return;
+    }
+
+    // A backend által elvárt regisztrációs adatok összeállítása
+    const registerData = {
+      FullName: basicFormData.fullName,
+      Email: basicFormData.email,
+      Password: basicFormData.password,
+      BirthDate: basicFormData.birthDate,
+      Gender: basicFormData.gender === 'ferfi', // Ha 'ferfi', akkor true, egyébként false
+      City: basicFormData.city,
+    };
+
+    try {
+      const response = await fetch('https://localhost:7248/api/Auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registerData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Regisztráció sikertelen: ' + JSON.stringify(errorData));
+      } else {
+        alert('Sikeres regisztráció!');
+      }
+    } catch (error) {
+      console.error('Hiba a regisztráció során:', error);
+      alert('Hiba történt a regisztráció során');
+    }
+
+    // Ha minden oké, ürítsük ki a formot:
     setBasicFormData({
       fullName: '',
       email: '',
@@ -81,12 +112,12 @@ function App() {
       city: '',
       gender: '',
     });
-    // Ha szeretnénk, itt zárhatjuk be a modalt is:
+    // És ha szeretnénk, itt zárhatjuk be a modalt is:
     // setIsCertifiedModalOpen(false);
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 2) HITELSZERVEZŐ (hitelesített) REGISZTRÁCIÓS ŰRLAP
+  // 2) HITELSZERVEZŐ (hitelesített) REGISZTRÁCIÓS ŰRLAP (Backend integráció)
   // ─────────────────────────────────────────────────────────────
   const [certifiedFormData, setCertifiedFormData] = useState({
     organizerName: '',
@@ -101,6 +132,80 @@ function App() {
     bankAccount: '',
     idDocument: null as File | null,
   });
+
+  const handleCertifiedInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setCertifiedFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCertifiedFormData((prev) => ({
+        ...prev,
+        idDocument: file,
+      }));
+    }
+  };
+
+  const handleCertifiedSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // A backend által elvárt regisztrációs adatok (hitelesített)
+    const registerData = {
+      OrganizerName: certifiedFormData.organizerName,
+      CompanyName: certifiedFormData.companyName,
+      TaxNumber: certifiedFormData.taxNumber,
+      CompanyRegisterNumber: certifiedFormData.companyRegisterNumber,
+      PhoneNumber: certifiedFormData.phoneNumber,
+      Email: certifiedFormData.email,
+      Address: certifiedFormData.address,
+      Website: certifiedFormData.website,
+      ShortDescription: certifiedFormData.shortDescription,
+      BankAccount: certifiedFormData.bankAccount,
+      // Fájlt külön (multipart) kellene küldeni, ha a backend úgy várja,
+      // itt most egyszerűségként JSON-be tesszük, ha a backend is így kezeli.
+    };
+
+    try {
+      const response = await fetch('https://localhost:7248/api/Auth/registercertified', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registerData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Regisztráció sikertelen: ' + JSON.stringify(errorData));
+      } else {
+        alert('Köszönjük! A hitelesítés folyamatban van.');
+      }
+    } catch (error) {
+      console.error('Hiba a regisztráció során:', error);
+      alert('Hiba történt a regisztráció során');
+    }
+
+    // Reset és modal bezárás
+    setCertifiedFormData({
+      organizerName: '',
+      companyName: '',
+      taxNumber: '',
+      companyRegisterNumber: '',
+      phoneNumber: '',
+      email: '',
+      address: '',
+      website: '',
+      shortDescription: '',
+      bankAccount: '',
+      idDocument: null,
+    });
+    setIsCertifiedModalOpen(false);
+  };
 
   // PARTI LÉTREHOZÓ FORM
   const [formData, setFormData] = useState({
@@ -186,8 +291,9 @@ function App() {
     e.preventDefault();
     setIsMenuOpen(false);
     setIsCertifiedModalOpen(true);
-    // Alaphelyzet: pl. a hitelesített űrlapot mutassuk elsőre
-    setShowCertifiedForm(true);
+    // Alaphelyzetben pl. a hitelesített űrlapra is ugorhatnánk,
+    // de maradhat a sima is:
+    // setShowCertifiedForm(true);
   };
   const closeCertifiedModal = () => setIsCertifiedModalOpen(false);
 
@@ -215,47 +321,6 @@ function App() {
       theme: '',
       description: '',
     });
-  };
-
-  // HITELSZERVEZŐ FORM KEZELÉSE
-  const handleCertifiedInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setCertifiedFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCertifiedFormData((prev) => ({
-        ...prev,
-        idDocument: file,
-      }));
-    }
-  };
-
-  const handleCertifiedSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Hitelesített adatok:', certifiedFormData);
-    alert('Köszönjük! A hitelesítés folyamatban van.');
-    setCertifiedFormData({
-      organizerName: '',
-      companyName: '',
-      taxNumber: '',
-      companyRegisterNumber: '',
-      phoneNumber: '',
-      email: '',
-      address: '',
-      website: '',
-      shortDescription: '',
-      bankAccount: '',
-      idDocument: null,
-    });
-    setIsCertifiedModalOpen(false);
   };
 
   // SECTION2 megfigyelése (Intersection Observer)
@@ -430,6 +495,7 @@ function App() {
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
+                {/* Ha erre kattint a felhasználó, ugyanazt a modalt nyitjuk, mint a navbarban */}
                 <a
                   href="#"
                   className="register-link"
@@ -696,12 +762,11 @@ function App() {
                 </button>
               </div>
 
-              {/* 1) SIMA REGISZTRÁCIÓS ŰRLAP */}
+              {/* 1) SIMA REGISZTRÁCIÓS ŰRLAP (backendhez kötve) */}
               {!showCertifiedForm && (
-                <form
-                  onSubmit={handleBasicSubmit}
+                <form 
+                  onSubmit={handleBasicSubmit} 
                   className="certified-form"
-                // Ha inkább külön class kellene: className="basic-form"
                 >
                   <div className="form-group">
                     <label htmlFor="fullName">Teljes név</label>
@@ -799,7 +864,7 @@ function App() {
                 </form>
               )}
 
-              {/* 2) HITELSZERVEZŐI (HITELESÍTETT) ŰRLAP */}
+              {/* 2) HITELSZERVEZŐI (HITELESÍTETT) ŰRLAP (backendhez kötve) */}
               {showCertifiedForm && (
                 <form className="certified-form" onSubmit={handleCertifiedSubmit}>
                   <div className="form-group">
