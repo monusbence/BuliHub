@@ -410,3 +410,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+BuliHub_Backend/.vs/Bulihub_Backend/v17/.suo
+BuliHub_Backend/.vs/Bulihub_Backend/v17/DocumentLayout.backup.json
+BuliHub_Backend/.vs/Bulihub_Backend/v17/DocumentLayout.json
