@@ -35,18 +35,13 @@ function App() {
   // MODAL (Hitelesített szervezői regisztráció)
   const [isCertifiedModalOpen, setIsCertifiedModalOpen] = useState<boolean>(false);
 
-  // ─────────────────────────────────────────────────────────────
-  // ÚJ: Váltás a modalban a „Sima regisztráció” és 
-  // a „Hitelesített szervezői regisztráció” között
-  // ─────────────────────────────────────────────────────────────
+  // ÚJ: Váltás a modalban a „Sima regisztráció” és a „Hitelesített szervezői regisztráció” között
   const [showCertifiedForm, setShowCertifiedForm] = useState<boolean>(false);
   const handleFormToggle = (isCertified: boolean) => {
     setShowCertifiedForm(isCertified);
   };
 
-  // ─────────────────────────────────────────────────────────────
   // 1) SIMA REGISZTRÁCIÓS ŰRLAP (Backend integráció)
-  // ─────────────────────────────────────────────────────────────
   const [basicFormData, setBasicFormData] = useState({
     fullName: '',
     email: '',
@@ -112,13 +107,9 @@ function App() {
       city: '',
       gender: '',
     });
-    // És ha szeretnénk, itt zárhatjuk be a modalt is:
-    // setIsCertifiedModalOpen(false);
   };
 
-  // ─────────────────────────────────────────────────────────────
   // 2) HITELSZERVEZŐ (hitelesített) REGISZTRÁCIÓS ŰRLAP (Backend integráció)
-  // ─────────────────────────────────────────────────────────────
   const [certifiedFormData, setCertifiedFormData] = useState({
     organizerName: '',
     companyName: '',
@@ -156,7 +147,7 @@ function App() {
   const handleCertifiedSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // A backend által elvárt regisztrációs adatok (hitelesített)
+    // A backend által elvárt regisztrációs adatok
     const registerData = {
       OrganizerName: certifiedFormData.organizerName,
       CompanyName: certifiedFormData.companyName,
@@ -168,8 +159,7 @@ function App() {
       Website: certifiedFormData.website,
       ShortDescription: certifiedFormData.shortDescription,
       BankAccount: certifiedFormData.bankAccount,
-      // Fájlt külön (multipart) kellene küldeni, ha a backend úgy várja,
-      // itt most egyszerűségként JSON-be tesszük, ha a backend is így kezeli.
+      // Fájlkezelés: itt csak példa, lehet, hogy külön (multipart form) kell a valódi implementációhoz
     };
 
     try {
@@ -218,11 +208,16 @@ function App() {
     description: '',
   });
 
-  // STATE a bejelentkezéshez
+  // Állapot a bejelentkezéshez
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  // SECTION2 kártyák állapota
+  // ─────────────────────────────────────────────────────
+  // ÚJ: Felhasználó állapot a navbarhoz (név + kijelentkezés)
+  // ─────────────────────────────────────────────────────
+  const [user, setUser] = useState<{ fullName: string } | null>(null);
+
+  // Section2 kártyák állapota
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const section2Ref = useRef<HTMLDivElement>(null);
 
@@ -252,31 +247,34 @@ function App() {
   }, [isCertifiedModalOpen, locked]);
 
   // GÖRGETÉS KEZELÉSE (telefon forgatás)
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    const SCROLL_DISTANCE = 500;
-    const delta = e.deltaY;
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      const SCROLL_DISTANCE = 500;
+      const delta = e.deltaY;
 
-    if (locked) {
-      e.preventDefault();
-      const newProgress = progress + delta / SCROLL_DISTANCE;
-      const clampedProgress = Math.max(0, Math.min(1, newProgress));
-      setProgress(clampedProgress);
-      if (clampedProgress >= 1) {
-        setLocked(false);
-      }
-    } else {
-      // Ha tetején vagyunk és "felfelé görgetünk":
-      if (window.scrollY === 0 && delta < 0 && progress > 0) {
+      if (locked) {
         e.preventDefault();
         const newProgress = progress + delta / SCROLL_DISTANCE;
         const clampedProgress = Math.max(0, Math.min(1, newProgress));
         setProgress(clampedProgress);
-        if (clampedProgress <= 0) {
-          setLocked(true);
+        if (clampedProgress >= 1) {
+          setLocked(false);
+        }
+      } else {
+        // Ha tetején vagyunk és "felfelé görgetünk":
+        if (window.scrollY === 0 && delta < 0 && progress > 0) {
+          e.preventDefault();
+          const newProgress = progress + delta / SCROLL_DISTANCE;
+          const clampedProgress = Math.max(0, Math.min(1, newProgress));
+          setProgress(clampedProgress);
+          if (clampedProgress <= 0) {
+            setLocked(true);
+          }
         }
       }
-    }
-  }, [locked, progress]);
+    },
+    [locked, progress]
+  );
 
   // TELEFON FORGATÁS SZÖG
   const startAngle = -15;
@@ -291,9 +289,6 @@ function App() {
     e.preventDefault();
     setIsMenuOpen(false);
     setIsCertifiedModalOpen(true);
-    // Alaphelyzetben pl. a hitelesített űrlapra is ugorhatnánk,
-    // de maradhat a sima is:
-    // setShowCertifiedForm(true);
   };
   const closeCertifiedModal = () => setIsCertifiedModalOpen(false);
 
@@ -364,16 +359,26 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         alert('Bejelentkezés sikertelen: ' + errorText);
       } else {
+        // Ha sikeres, fogadjuk a választ, pl. user adatokkal
+        const data = await response.json();
+        // Például "fullName" mezőnek hívjuk a visszakapott adatot:
+        setUser({ fullName: data.fullName });
         alert('Bejelentkezés sikeres!');
       }
     } catch (error) {
       console.error('Hiba a bejelentkezés során:', error);
       alert('Hiba történt a bejelentkezés során');
     }
+  };
+
+  // KIJELENTKEZÉS
+  const handleLogout = () => {
+    setUser(null);
   };
 
   return (
@@ -399,6 +404,7 @@ function App() {
               alt="BuliHub Logo"
             />
           </div>
+
           <div
             className={`hamburger ${isMenuOpen ? 'active' : ''}`}
             onClick={toggleMenu}
@@ -407,6 +413,7 @@ function App() {
             <span></span>
             <span></span>
           </div>
+
           <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
             <li>
               <a href="#section1" onClick={() => setIsMenuOpen(false)}>
@@ -429,6 +436,16 @@ function App() {
               </a>
             </li>
           </ul>
+
+          {/* Ha van bejelentkezett felhasználó, jelenjen meg a neve + kijelentkezés gomb */}
+          {user && (
+            <div className="user-info">
+              <span>{user.fullName}</span>
+              <button className="logout-btn" onClick={handleLogout}>
+                Kijelentkezés
+              </button>
+            </div>
+          )}
         </nav>
 
         <section id="section1">
@@ -495,7 +512,7 @@ function App() {
                 <a href="#" className="forgot-link">
                   Elfelejtetted a jelszavad?
                 </a>
-                {/* Ha erre kattint a felhasználó, ugyanazt a modalt nyitjuk, mint a navbarban */}
+                {/* Ha erre kattint, nyílik a modal */}
                 <a
                   href="#"
                   className="register-link"
@@ -850,7 +867,6 @@ function App() {
                       <option value="">Válassz nemet</option>
                       <option value="ferfi">Férfi</option>
                       <option value="no">Nő</option>
-                      <option value="egyeb">Egyéb</option>
                     </select>
                   </div>
                   <motion.button
@@ -988,6 +1004,33 @@ function App() {
                       onChange={handleCertifiedInputChange}
                     />
                   </div>
+
+                  {/* A hitelesített formhoz is kérünk jelszót + jelszómegerősítést */}
+                  <div className="form-group">
+                    <label htmlFor="password">Jelszó</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="******"
+                      value={basicFormData.password}
+                      onChange={handleBasicInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="confirmPassword">Jelszó megerősítése</label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="******"
+                      value={basicFormData.confirmPassword}
+                      onChange={handleBasicInputChange}
+                      required
+                    />
+                  </div>
+
                   <div className="form-group">
                     <label htmlFor="idDocument">
                       Igazolvány / Dokumentum (PDF/JPG)
