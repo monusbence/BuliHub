@@ -4,6 +4,7 @@ using Bulihub_Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bulihub_Backend.Migrations
 {
     [DbContext(typeof(BuliHubDbContext))]
-    partial class BuliHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250207085820_UpdateIdentitySchema8")]
+    partial class UpdateIdentitySchema8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

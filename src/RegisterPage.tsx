@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';  
 
-const Register: React.FC = () => {
- 
+function Register () {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const toggleMenu = () => {
@@ -39,11 +38,12 @@ const Register: React.FC = () => {
 
     // Készítjük el a backend által elvárt regisztrációs adatokat
     const registerData = {
-      email: formData.email,
-      password: formData.password,
-      birthDate: formData.birthDate, // Ügyelj arra, hogy a formátum megfeleljen a backend elvárásainak
-      gender: formData.gender === 'férfi', // Példa: 'férfi' esetén true, egyébként false
-      name: formData.fullName,
+      FullName: formData.fullName, // A backend DTO-ban FullName néven várjuk a nevet
+      Email: formData.email,
+      Password: formData.password,
+      BirthDate: formData.birthDate, // Ügyelj arra, hogy a formátum megfeleljen a backend elvárásainak
+      Gender: formData.gender === 'férfi', // 'férfi' esetén true, egyébként false
+      City: formData.city            // Városadat elküldése
     };
 
     try {
@@ -67,21 +67,15 @@ const Register: React.FC = () => {
 
   return (
     <div className="app-container" style={{ overflow: 'auto' }}>
-      
-     
       <nav className="navbar">
         <div className="logo">
           <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
         </div>
-        <div
-          className={`hamburger ${isMenuOpen ? 'active' : ''}`}
-          onClick={toggleMenu}
-        >
+        <div className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
           <span></span>
           <span></span>
           <span></span>
         </div>
-
         <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
           <li>
             <a href="#section1" onClick={() => setIsMenuOpen(false)}>
@@ -105,16 +99,7 @@ const Register: React.FC = () => {
           </li>
         </ul>
       </nav>
-
-      
-      <div
-        className="register-content"
-        style={{
-          display: 'flex',
-          minHeight: '100vh',
-        }}
-      >
-        
+      <div className="register-content" style={{ display: 'flex', minHeight: '100vh' }}>
         <div
           className="left-column"
           style={{
@@ -131,8 +116,6 @@ const Register: React.FC = () => {
             style={{ width: '500px', height: 'auto' }}
           />
         </div>
-
-        
         <div
           className="right-column"
           style={{
@@ -153,18 +136,9 @@ const Register: React.FC = () => {
               borderRadius: '1rem',
             }}
           >
-            <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-              Regisztráció
-            </h2>
-
-            
+            <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Regisztráció</h2>
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="fullName"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Teljes név
-              </label>
+              <label htmlFor="fullName" style={{ display: 'block', marginBottom: '0.5rem' }}>Teljes név</label>
               <input
                 type="text"
                 id="fullName"
@@ -173,23 +147,11 @@ const Register: React.FC = () => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-            
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="email"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                E-mail
-              </label>
+              <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem' }}>E-mail</label>
               <input
                 type="email"
                 id="email"
@@ -198,23 +160,11 @@ const Register: React.FC = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-            
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="password"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Jelszó
-              </label>
+              <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem' }}>Jelszó</label>
               <input
                 type="password"
                 id="password"
@@ -223,23 +173,11 @@ const Register: React.FC = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-            
             <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="confirmPassword"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Jelszó megerősítése
-              </label>
+              <label htmlFor="confirmPassword" style={{ display: 'block', marginBottom: '0.5rem' }}>Jelszó megerősítése</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -248,23 +186,11 @@ const Register: React.FC = () => {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-            
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="birthDate"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Születési dátum
-              </label>
+              <label htmlFor="birthDate" style={{ display: 'block', marginBottom: '0.5rem' }}>Születési dátum</label>
               <input
                 type="date"
                 id="birthDate"
@@ -272,23 +198,11 @@ const Register: React.FC = () => {
                 value={formData.birthDate}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-           
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="city"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Város
-              </label>
+              <label htmlFor="city" style={{ display: 'block', marginBottom: '0.5rem' }}>Város</label>
               <input
                 type="text"
                 id="city"
@@ -297,42 +211,24 @@ const Register: React.FC = () => {
                 value={formData.city}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               />
             </div>
-
-            
             <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="gender"
-                style={{ display: 'block', marginBottom: '0.5rem' }}
-              >
-                Nem
-              </label>
+              <label htmlFor="gender" style={{ display: 'block', marginBottom: '0.5rem' }}>Nem</label>
               <select
                 id="gender"
                 name="gender"
                 value={formData.gender}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                }}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: 'none' }}
               >
                 <option value="">Válassz nemet</option>
                 <option value="férfi">Férfi</option>
                 <option value="nő">Nő</option>
               </select>
             </div>
-
             <button
               type="submit"
               style={{
@@ -371,4 +267,3 @@ const Register: React.FC = () => {
 };
 
 export default Register;
-

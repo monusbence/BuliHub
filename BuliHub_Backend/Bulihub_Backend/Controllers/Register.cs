@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Bulihub_Backend.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace BuliHub_Backend.Controllers
 {
@@ -29,10 +33,9 @@ namespace BuliHub_Backend.Controllers
                 UserName = model.Email, // Az Identity-ben a UserName is kötelező
                 BirthDate = model.BirthDate,
                 Gender = model.Gender, // Már bool típusú érték
-                Name = model.FullName,
-                // Mivel az ApplicationUser nem tartalmaz külön City tulajdonságot,
-                // itt a Status mezőbe illesztjük a város információt.
-                Status = $"Active; City: {model.City}"
+                Name = model.FullName, // A regisztrációs formából érkező név
+                City = model.City,     // Az új City mezőbe kerül a város
+                Status = "Active"
             };
 
             var result = await _userManager.CreateAsync(newUser, model.Password);
@@ -62,7 +65,28 @@ namespace BuliHub_Backend.Controllers
             if (!result.Succeeded)
                 return Unauthorized("Invalid credentials");
 
-            return Ok("Login successful");
+            // JWT token generálása
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.Name)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey@345SuperSecretKey@345"));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: "bulihub.hu",
+                audience: "bulihub.hu",
+                claims: claims,
+                expires: DateTime.Now.AddDays(7),
+                signingCredentials: creds);
+
+            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new { token = jwtToken, name = user.Name });
         }
     }
 

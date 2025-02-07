@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from './components/footer';
@@ -65,6 +66,9 @@ function App() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
+  // Új state a bejelentkezett felhasználóhoz (token és név)
+  const [user, setUser] = useState<{ token: string, name: string } | null>(null);
+
   // SECTION2 kártyák állapota
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const section2Ref = useRef<HTMLDivElement>(null);
@@ -75,6 +79,15 @@ function App() {
       setShowSplash(false);
     }, 4000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // LOCALSTORAGE-ból visszaállítjuk a felhasználói adatokat (ha van)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("name");
+    if (token && name) {
+      setUser({ token, name });
+    }
   }, []);
 
   // BODY SCROLL TILTÁSA (ha locked van)
@@ -245,12 +258,24 @@ function App() {
         const errorText = await response.text();
         alert('Bejelentkezés sikertelen: ' + errorText);
       } else {
+        const data = await response.json();
+        setUser({ token: data.token, name: data.name });
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("name", data.name);
         alert('Bejelentkezés sikeres!');
       }
     } catch (error) {
       console.error('Hiba a bejelentkezés során:', error);
       alert('Hiba történt a bejelentkezés során');
     }
+  };
+
+  // KIJELENTKEZÉS HANDLER
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("name");
+    alert("Sikeres kijelentkezés");
   };
 
   return (
@@ -266,6 +291,13 @@ function App() {
           <div className="logo">
             <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
           </div>
+          {/* Ha a felhasználó be van jelentkezve, itt jelenik meg a neve és a kijelentkezés gomb */}
+          {user && (
+            <div className="user-info">
+              <span>Üdv, {user.name}</span>
+              <button className="logout-btn" onClick={handleLogout}>Kijelentkezés</button>
+            </div>
+          )}
           <div className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
             <span></span>
             <span></span>
@@ -509,4 +541,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,3 +1,5 @@
+/* App.css */
+
 /* Globális reset */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -81,11 +83,37 @@ body {
   height: auto;
 }
 
+/* Felhasználói adatok megjelenítése a nav-barban */
+.user-info {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info span {
+  font-weight: bold;
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #fff;
+  color: #000;
+}
+
 /* Navigációs linkek */
 .nav-links {
   list-style: none;
   display: flex;
-  margin-left: auto;
+  margin-left: 1.5rem;
   gap: 1.5rem;
   transition: all 0.3s ease;
 }
