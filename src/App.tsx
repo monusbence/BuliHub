@@ -180,7 +180,7 @@ function App() {
       alert('Hiba történt a regisztráció során');
     }
 
-    // Reset és modal bezárás
+    // Ha minden oké, reset és modal bezárás
     setCertifiedFormData({
       organizerName: '',
       companyName: '',
@@ -216,6 +216,10 @@ function App() {
   // ÚJ: Felhasználó állapot a navbarhoz (név + kijelentkezés)
   // ─────────────────────────────────────────────────────
   const [user, setUser] = useState<{ fullName: string } | null>(null);
+
+  // --- ÚJ Állapotok a sikeres bejelentkezéshez (modal) ---
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState<boolean>(false);
+  const [loginSuccessName, setLoginSuccessName] = useState<string>('');
 
   // Section2 kártyák állapota
   const [cardsExpanded, setCardsExpanded] = useState(false);
@@ -318,7 +322,7 @@ function App() {
     });
   };
 
-  // SECTION2 megfigyelése (Intersection Observer)
+  // SECTION2 kártyák állapota (Intersection Observer)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -367,8 +371,11 @@ function App() {
         // Ha sikeres, fogadjuk a választ, pl. user adatokkal
         const data = await response.json();
         // Például "fullName" mezőnek hívjuk a visszakapott adatot:
-        setUser({ fullName: data.fullName });
-        alert('Bejelentkezés sikeres!');
+        setUser({ fullName: data.name });
+
+        // ÚJ: Nem alert, hanem modern modal-szerű megjelenítés:
+        setLoginSuccessName(data.name);
+        setLoginSuccessMessage(true);
       }
     } catch (error) {
       console.error('Hiba a bejelentkezés során:', error);
@@ -595,97 +602,104 @@ function App() {
             <div className="left-side">
               <h2>Hozz létre egy bulit!</h2>
               <p>Töltsd ki az alábbi űrlapot a buli részleteivel.</p>
-              <form className="party-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="partyName">Buli neve</label>
-                  <input
-                    type="text"
-                    id="partyName"
-                    name="partyName"
-                    placeholder="Add meg a buli nevét"
-                    value={formData.partyName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="date">Dátum</label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="time">Időpont</label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    value={formData.time}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="location">Helyszín</label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    placeholder="Add meg a helyszínt"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="guests">Vendégek száma</label>
-                  <input
-                    type="number"
-                    id="guests"
-                    name="guests"
-                    min="1"
-                    placeholder="Hány vendéget vársz?"
-                    value={formData.guests}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="theme">Téma</label>
-                  <select
-                    id="theme"
-                    name="theme"
-                    value={formData.theme}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Válassz egy témát</option>
-                    <option value="retro">Retro</option>
-                    <option value="techno">Techno</option>
-                    <option value="hiphop">Hip-Hop</option>
-                    <option value="others">Egyéb</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="description">Leírás</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={4}
-                    placeholder="Írj egy rövid leírást a buliról..."
-                    value={formData.description}
-                    onChange={handleInputChange}
-                  ></textarea>
-                </div>
-                <button type="submit" className="btn submit-btn">
-                  Buli létrehozása
-                </button>
-              </form>
+              {/* Csak akkor jelenjen meg az űrlap, ha be van jelentkezve */}
+              {user ? (
+                <form className="party-form" onSubmit={handleSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="partyName">Buli neve</label>
+                    <input
+                      type="text"
+                      id="partyName"
+                      name="partyName"
+                      placeholder="Add meg a buli nevét"
+                      value={formData.partyName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="date">Dátum</label>
+                    <input
+                      type="date"
+                      id="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="time">Időpont</label>
+                    <input
+                      type="time"
+                      id="time"
+                      name="time"
+                      value={formData.time}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="location">Helyszín</label>
+                    <input
+                      type="text"
+                      id="location"
+                      name="location"
+                      placeholder="Add meg a helyszínt"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="guests">Vendégek száma</label>
+                    <input
+                      type="number"
+                      id="guests"
+                      name="guests"
+                      min="1"
+                      placeholder="Hány vendéget vársz?"
+                      value={formData.guests}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="theme">Téma</label>
+                    <select
+                      id="theme"
+                      name="theme"
+                      value={formData.theme}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Válassz egy témát</option>
+                      <option value="retro">Retro</option>
+                      <option value="techno">Techno</option>
+                      <option value="hiphop">Hip-Hop</option>
+                      <option value="others">Egyéb</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="description">Leírás</label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      rows={4}
+                      placeholder="Írj egy rövid leírást a buliról..."
+                      value={formData.description}
+                      onChange={handleInputChange}
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="btn submit-btn">
+                    Buli létrehozása
+                  </button>
+                </form>
+              ) : (
+                <p style={{ marginTop: '20px', fontStyle: 'italic', color: '#555' }}>
+                  Jelentkezz be, hogy létrehozhass egy bulit!
+                </p>
+              )}
             </div>
             <div className="right-side">
               <img
@@ -1055,6 +1069,46 @@ function App() {
               )}
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* ÚJ: Sikeres bejelentkezéskor felugró, modern modal háttér-homályosítással */}
+      <AnimatePresence>
+        {loginSuccessMessage && (
+          <motion.div
+            className="login-success-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="login-success-modal"
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.7 }}
+            >
+              <h2 style={{ marginBottom: '1rem' }}>
+                Helló, <span style={{ color: '#c841c6' }}>{loginSuccessName}</span>!
+              </h2>
+              <p style={{ marginBottom: '1rem' }}>
+                Sikeresen bejelentkeztél a BuliHub-ra.
+              </p>
+              <button
+                onClick={() => setLoginSuccessMessage(false)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#c841c6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                OK
+              </button>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
