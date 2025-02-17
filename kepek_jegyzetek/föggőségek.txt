@@ -2,3 +2,9 @@ npm i
 npm i motion
 npm i react-router-dom
 npm i react-leaflet@4.2.1
+
+
+-BACKEND:
+
+dotnet tool install --global dotnet-ef
+dotnet ef database update
