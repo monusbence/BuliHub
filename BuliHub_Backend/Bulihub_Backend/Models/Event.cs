@@ -28,5 +28,10 @@ namespace Bulihub_Backend.Models
         public Location? Location { get; set; }
 
         public string Status { get; set; } = string.Empty;
+
+        // Új mezők a frontend adatokhoz
+        public int? Guests { get; set; }
+        public string? Theme { get; set; }
+        public string? LocationName { get; set; }
     }
 }

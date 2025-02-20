@@ -43,9 +43,35 @@ namespace Bulihub_Backend.Controllers
 
         // POST: api/events
         [HttpPost]
-        public async Task<IActionResult> CreateEvent([FromBody] Event newEvent)
+        public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto dto)
         {
-            
+            DateTime startDate;
+            try
+            {
+                var timeParts = dto.Time.Split(':');
+                int hour = int.Parse(timeParts[0]);
+                int minute = int.Parse(timeParts[1]);
+                startDate = new DateTime(dto.Date.Year, dto.Date.Month, dto.Date.Day, hour, minute, 0);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Invalid time format.");
+            }
+
+            var newEvent = new Event
+            {
+                Name = dto.PartyName,
+                Description = dto.Description,
+                StartDate = startDate,
+                EndDate = startDate.AddHours(4), // alapértelmezett 4 órás időtartam
+                LocationName = dto.Location,
+                Guests = dto.Guests,
+                Theme = dto.Theme,
+                ProviderId = 0, // mivel nincs szolgáltató kiválasztva az űrlapban
+                LocationId = 0, // mivel nincs location azonosító
+                Status = "Upcoming"
+            };
+
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
@@ -86,4 +112,16 @@ namespace Bulihub_Backend.Controllers
             return NoContent();
         }
     }
+
+    public class CreateEventDto
+    {
+        public string PartyName { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string Time { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public int Guests { get; set; }
+        public string Theme { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
 }
+
