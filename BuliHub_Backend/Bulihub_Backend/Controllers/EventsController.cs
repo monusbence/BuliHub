@@ -1,5 +1,6 @@
 ﻿using Bulihub_Backend.Data;
 using Bulihub_Backend.Models;
+using Bulihub_Backend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,12 +64,12 @@ namespace Bulihub_Backend.Controllers
                 Name = dto.PartyName,
                 Description = dto.Description,
                 StartDate = startDate,
-                EndDate = startDate.AddHours(4), // alapértelmezett 4 órás időtartam
+                EndDate = startDate.AddHours(4), // Alapértelmezett 4 órás időtartam
                 LocationName = dto.Location,
                 Guests = dto.Guests,
                 Theme = dto.Theme,
-                ProviderId = 0, // mivel nincs szolgáltató kiválasztva az űrlapban
-                LocationId = 0, // mivel nincs location azonosító
+                ProviderId = 0, // Mivel nincs szolgáltató kiválasztva az űrlapban
+                LocationId = 0, // Mivel nincs location azonosító
                 Status = "Upcoming"
             };
 
@@ -112,16 +113,4 @@ namespace Bulihub_Backend.Controllers
             return NoContent();
         }
     }
-
-    public class CreateEventDto
-    {
-        public string PartyName { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public string Time { get; set; } = string.Empty;
-        public string Location { get; set; } = string.Empty;
-        public int Guests { get; set; }
-        public string Theme { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-    }
 }
-

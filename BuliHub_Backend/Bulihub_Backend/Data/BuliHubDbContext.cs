@@ -11,18 +11,17 @@ namespace Bulihub_Backend.Data
                       int>
     {
         public BuliHubDbContext(DbContextOptions<BuliHubDbContext> options)
-        : base(options)
+            : base(options)
         {
         }
 
         // Saját entitások
         public DbSet<Models.User> Users { get; set; } = null!;
-        //public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
         public DbSet<Models.ServiceProvider> ServiceProviders { get; set; } = null!;
         public DbSet<Report> Reports { get; set; } = null!;
-        //public DbSet<Location> Locations { get; set; } = null!;
+        public DbSet<Location> Locations { get; set; } = null!;  // Engedélyezd ezt a sort
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -39,4 +38,5 @@ namespace Bulihub_Backend.Data
             // További beállítások...
         }
     }
+
 }
