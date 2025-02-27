@@ -30,11 +30,11 @@ namespace BuliHub_Backend.Controllers
             var newUser = new ApplicationUser
             {
                 Email = model.Email,
-                UserName = model.Email, // Az Identity-ben a UserName is kötelező
+                UserName = model.Email,
                 BirthDate = model.BirthDate,
-                Gender = model.Gender, // Már bool típusú érték
-                Name = model.FullName, // A regisztrációs formából érkező név
-                City = model.City,     // Az új City mezőbe kerül a város
+                Gender = model.Gender,
+                Name = model.FullName,
+                City = model.City,
                 Status = "Active"
             };
 
@@ -65,7 +65,7 @@ namespace BuliHub_Backend.Controllers
             if (!result.Succeeded)
                 return Unauthorized("Invalid credentials");
 
-            // JWT token generálása
+            // ClaimTypes.Name -> user.Name
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
@@ -74,7 +74,6 @@ namespace BuliHub_Backend.Controllers
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey@345SuperSecretKey@345"));
-
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -90,7 +89,6 @@ namespace BuliHub_Backend.Controllers
         }
     }
 
-    // DTO-k
     public class RegisterDto
     {
         public string FullName { get; set; } = string.Empty;
@@ -98,7 +96,7 @@ namespace BuliHub_Backend.Controllers
         public string Password { get; set; } = string.Empty;
         public DateTime? BirthDate { get; set; }
         public string City { get; set; } = string.Empty;
-        public bool Gender { get; set; }  // bool típusú érték, ahogy a formból érkezik
+        public bool Gender { get; set; }
     }
 
     public class LoginDto
@@ -107,5 +105,6 @@ namespace BuliHub_Backend.Controllers
         public string Password { get; set; } = string.Empty;
     }
 }
+
 
 

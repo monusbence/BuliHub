@@ -3,6 +3,7 @@ using Bulihub_Backend.Models;
 using Bulihub_Backend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Bulihub_Backend.Controllers
 {
@@ -21,7 +22,6 @@ namespace Bulihub_Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEvents()
         {
-            // Törölve: .Include(e => e.Location)
             var events = await _context.Events
                 .Include(e => e.Provider)
                 .ToListAsync();
@@ -33,7 +33,6 @@ namespace Bulihub_Backend.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetEventById(int id)
         {
-            // Törölve: .Include(e => e.Location)
             var ev = await _context.Events
                 .Include(e => e.Provider)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -46,6 +45,12 @@ namespace Bulihub_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto dto)
         {
+            // Kinyerjük a bejelentkezett user nevét (ClaimTypes.Name)
+            var userFullName = User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.Name)
+                ?.Value ?? "Ismeretlen szervező";
+
+            // Dátum+idő formázás
             DateTime startDate;
             try
             {
@@ -64,16 +69,13 @@ namespace Bulihub_Backend.Controllers
                 Name = dto.PartyName,
                 Description = dto.Description,
                 StartDate = startDate,
-                EndDate = startDate.AddHours(4), // Alapértelmezett 4 óra
-
-                // ***** Fontos: az új mezők
+                EndDate = startDate.AddHours(4), // default 4 óra
                 LocationName = dto.LocationName,
                 Address = dto.Address,
                 Equipment = dto.Equipment,
-
                 Guests = dto.Guests,
                 Theme = dto.Theme,
-                ProviderId = null,  // frontenden még nincsen kiválasztva
+                OrganizerName = userFullName,
                 Status = "Upcoming"
             };
 
@@ -96,12 +98,12 @@ namespace Bulihub_Backend.Controllers
             existing.Description = updatedEvent.Description;
             existing.StartDate = updatedEvent.StartDate;
             existing.EndDate = updatedEvent.EndDate;
-
             existing.LocationName = updatedEvent.LocationName;
             existing.Address = updatedEvent.Address;
             existing.Equipment = updatedEvent.Equipment;
             existing.Guests = updatedEvent.Guests;
             existing.Theme = updatedEvent.Theme;
+            existing.OrganizerName = updatedEvent.OrganizerName; // Ha frissíteni akarod
             existing.ProviderId = updatedEvent.ProviderId;
             existing.Status = updatedEvent.Status;
 
@@ -123,3 +125,4 @@ namespace Bulihub_Backend.Controllers
         }
     }
 }
+

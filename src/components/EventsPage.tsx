@@ -2,34 +2,46 @@ import React, { useState, useEffect } from 'react';
 import Footer from './footer';
 import './EventsPage.css';
 
+// Időpont formázása: 2025.12.09 19:30
+function formatDateTime(dateString: string): string {
+  if (!dateString) return '';
+  const dateObj = new Date(dateString);
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const hours = String(dateObj.getHours()).padStart(2, '0');
+  const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
+}
+
+// Esemény interface
 interface EventItem {
   id: number;
-  title: string;
+  title: string;        // => name (backend)
+  description: string;
   startDate: string;
   endDate: string;
-  location: string;
-  category: string;
+  location: string;     // => locationName
+  address: string;      // => address
+  equipment: string;    // => equipment
+  organizer: string;    // => organizerName
+  category: string;     // => theme
   imageUrl: string;
-  description: string;
-  organizer: string;
 }
 
 function EventsPage() {
-  // Általános betöltési állapot
+  // Betöltés, események
   const [isLoading, setIsLoading] = useState(true);
-  const [events, setEvents] = useState<EventItem[]>([]); // <-- A backendről jövő események itt tárolódnak
+  const [events, setEvents] = useState<EventItem[]>([]);
 
+  // Responsive
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // Alap szűrési állapotok
+  // Szűrés
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
-
-  // Részletes szűrés elrejtése/megmutatása
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
-
-  // Részletes szűrési állapotok
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -39,42 +51,45 @@ function EventsPage() {
   const [minDuration, setMinDuration] = useState('');
   const [maxDuration, setMaxDuration] = useState('');
 
-  // A kiválasztott esemény a modalhoz
+  // Modal
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
-  // ESEMÉNYEK LEKÉRÉSE A BACKENDRŐL
+  // Lekérés a backendről
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
       try {
         const response = await fetch('https://localhost:7248/api/Events', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
-          throw new Error(`Hiba az események lekérése közben: ${response.status} ${response.statusText}`);
+          throw new Error(`Hiba: ${response.status} ${response.statusText}`);
         }
 
-        // Válasz JSON
-        const data: any[] = await response.json(); // A valós adatszerkezet
-        // Mappelés a front-end által használt mezőkre
-        const mappedEvents: EventItem[] = data.map((ev: any) => ({
+        const data = await response.json();
+        console.log('=== DEBUG: Raw events from server ===', data);
+
+        // Mappeljük a frontendi mezőkre
+        const mapped: EventItem[] = data.map((ev: any) => ({
           id: ev.id,
           title: ev.name || 'Esemény címe',
-          startDate: ev.startDate || '',
-          endDate: ev.endDate || '',
-          location: ev.locationName || 'Ismeretlen helyszín',
-          category: ev.theme || 'Egyéb',  // Esetleg 'Fesztivál', 'Koncert' stb. ha a theme megfelel
-          imageUrl: `https://picsum.photos/300/200?random=${ev.id}`, // Ide tehetsz fix URL-t is
           description: ev.description || '',
-          organizer: ev.provider?.user?.name ?? 'Ismeretlen szervező'
-          // Ha nincs Provider object, ez a szervező mező 'Ismeretlen szervező' lesz
+          startDate: ev.startDate,
+          endDate: ev.endDate,
+          location: ev.locationName || 'Ismeretlen helyszín',
+          address: ev.address || '',
+          equipment: ev.equipment || '',
+          organizer: ev.organizerName || 'Ismeretlen szervező',
+          category: ev.theme || 'Egyéb',
+          imageUrl: `https://picsum.photos/300/200?random=${ev.id}`
         }));
 
-        setEvents(mappedEvents);
+        console.log('=== DEBUG: Mapped events ===', mapped);
+        setEvents(mapped);
       } catch (error) {
-        console.error(error);
+        console.error('Hiba a fetchEvents során:', error);
       } finally {
         setIsLoading(false);
       }
@@ -83,7 +98,7 @@ function EventsPage() {
     fetchEvents();
   }, []);
 
-  // Oldal újraméretezés figyelése
+  // Responsive
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
@@ -94,7 +109,7 @@ function EventsPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Események szűrése a beállított feltételek alapján
+  // Szűrés
   const filteredEvents = events.filter((event) => {
     const matchKeyword =
       event.title.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -110,16 +125,15 @@ function EventsPage() {
       ? event.organizer.toLowerCase().includes(organizerFilter.toLowerCase())
       : true;
 
-    // upcoming / past
     const now = new Date();
     const eventStart = new Date(event.startDate);
-    const matchUpcoming = upcoming ? eventStart >= now : true;
     const eventEnd = new Date(event.endDate);
+
+    const matchUpcoming = upcoming ? eventStart >= now : true;
     const matchPast = past ? eventEnd < now : true;
 
-    // időtartam-szűrés
     const durationInDays =
-      (new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / (1000 * 3600 * 24) + 1;
+      (eventEnd.getTime() - eventStart.getTime()) / (1000 * 3600 * 24) + 1;
     const matchMinDuration = minDuration ? durationInDays >= parseInt(minDuration) : true;
     const matchMaxDuration = maxDuration ? durationInDays <= parseInt(maxDuration) : true;
 
@@ -137,6 +151,7 @@ function EventsPage() {
     );
   });
 
+  // Betöltés
   if (isLoading) {
     return (
       <div className="preloader">
@@ -145,10 +160,10 @@ function EventsPage() {
     );
   }
 
+  // Render
   return (
     <div className="page-container">
       <div className="content-wrapper">
-        {/* Oldalsó menü */}
         <aside className={`sidebar-nav ${isSidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-content">
             <div className="sidebar-logo">
@@ -156,23 +171,11 @@ function EventsPage() {
             </div>
             <nav>
               <ul>
-                <li>
-                  <a href="/">Főoldal</a>
-                </li>
-                <li>
-                  <a href="/#section1">Szervezz Bulit</a>
-                </li>
-                <li>
-                  <a href="/#section2">Rólunk</a>
-                </li>
-                <li>
-                  <a href="/#section3">Kapcsolat</a>
-                </li>
-                <li>
-                  <a href="/events" className="active">
-                    Események
-                  </a>
-                </li>
+                <li><a href="/">Főoldal</a></li>
+                <li><a href="/#section1">Szervezz Bulit</a></li>
+                <li><a href="/#section2">Rólunk</a></li>
+                <li><a href="/#section3">Kapcsolat</a></li>
+                <li><a href="/events" className="active">Események</a></li>
               </ul>
             </nav>
           </div>
@@ -189,12 +192,10 @@ function EventsPage() {
           </button>
         </aside>
 
-        {/* Fő tartalom */}
         <main className="events-main-content">
           <h1>Események</h1>
           <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
 
-          {/* Szűrősáv: alap szűrés + gomb a részletes szűréshez */}
           <div className="filter-bar">
             <input
               type="text"
@@ -289,13 +290,25 @@ function EventsPage() {
                   <div className="event-card-content">
                     <h3>{event.title}</h3>
                     <p>
-                      <strong>Kezdés:</strong> {event.startDate}
+                      <strong>Kezdés:</strong> {formatDateTime(event.startDate)}
+                    </p>
+                    <p>
+                      <strong>Befejezés:</strong> {formatDateTime(event.endDate)}
                     </p>
                     <p>
                       <strong>Helyszín:</strong> {event.location}
                     </p>
+                    {event.address && (
+                      <p>Cím: {event.address}</p>
+                    )}
+                    {event.equipment && (
+                      <p>Extrák: {event.equipment}</p>
+                    )}
                     <p>
                       <strong>Kategória:</strong> {event.category}
+                    </p>
+                    <p>
+                      <strong>Szervező:</strong> {event.organizer}
                     </p>
                     <button className="btn-details" onClick={() => setSelectedEvent(event)}>
                       Részletek
@@ -308,7 +321,6 @@ function EventsPage() {
         </main>
       </div>
 
-      {/* Modal a részletes eseményadatokhoz (a képpel együtt) */}
       {selectedEvent && (
         <div className="modal">
           <div className="modal-content">
@@ -322,14 +334,20 @@ function EventsPage() {
               <strong>Leírás:</strong> {selectedEvent.description}
             </p>
             <p>
-              <strong>Kezdés:</strong> {selectedEvent.startDate}
+              <strong>Kezdés:</strong> {formatDateTime(selectedEvent.startDate)}
             </p>
             <p>
-              <strong>Befejezés:</strong> {selectedEvent.endDate}
+              <strong>Befejezés:</strong> {formatDateTime(selectedEvent.endDate)}
             </p>
             <p>
-              <strong>Helyszín:</strong> {selectedEvent.location}
+              <strong>Helyszín:</strong> {event.location}
             </p>
+            {selectedEvent.address && (
+              <p>Cím: {selectedEvent.address}</p>
+            )}
+            {selectedEvent.equipment && (
+              <p>Extrák: {selectedEvent.equipment}</p>
+            )}
             <p>
               <strong>Szervező:</strong> {selectedEvent.organizer}
             </p>

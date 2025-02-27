@@ -18,23 +18,23 @@ namespace Bulihub_Backend.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        // Korábban ProviderId
+        // Opcionális: ha van ServiceProvider tábla
         public int? ProviderId { get; set; }
         [ForeignKey(nameof(ProviderId))]
         public ServiceProvider? Provider { get; set; }
 
-
-        // ***** Új/átvett mezők a Location táblából:
-        public string? LocationName { get; set; }   // Például a helyszín neve
+        // A korábbi Location mezői:
+        public string? LocationName { get; set; }   // Helyszín neve
         public string? Address { get; set; }        // Cím
-        public string? Equipment { get; set; }      // Bármilyen felszerelés, extra infó
+        public string? Equipment { get; set; }      // Extrák
 
-        // Már nem kell: public int LocationId { get; set; }
-        // public Location? Location { get; set; }
+        // A bejelentkezett user neve
+        public string? OrganizerName { get; set; }
 
+        // Alapértelmezett
         public string Status { get; set; } = string.Empty;
 
-        // Új mezők a frontend adatokhoz
+        // Egyéb mezők
         public int? Guests { get; set; }
         public string? Theme { get; set; }
     }

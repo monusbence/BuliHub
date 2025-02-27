@@ -17,7 +17,6 @@ namespace Bulihub_Backend.DTOs
         [JsonPropertyName("locationName")]
         public string LocationName { get; set; } = string.Empty;
 
-        // ÚJ mezők, amiket eddig a Location típusba raktunk
         [JsonPropertyName("address")]
         public string Address { get; set; } = string.Empty;
 
