@@ -21,7 +21,7 @@ namespace Bulihub_Backend.Data
         public DbSet<Ticket> Tickets { get; set; } = null!;
         public DbSet<Models.ServiceProvider> ServiceProviders { get; set; } = null!;
         public DbSet<Report> Reports { get; set; } = null!;
-        public DbSet<Location> Locations { get; set; } = null!;  // Engedélyezd ezt a sort
+        
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

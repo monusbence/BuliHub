@@ -21,9 +21,9 @@ namespace Bulihub_Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEvents()
         {
+            // Törölve: .Include(e => e.Location)
             var events = await _context.Events
                 .Include(e => e.Provider)
-                .Include(e => e.Location)
                 .ToListAsync();
 
             return Ok(events);
@@ -33,9 +33,9 @@ namespace Bulihub_Backend.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetEventById(int id)
         {
+            // Törölve: .Include(e => e.Location)
             var ev = await _context.Events
                 .Include(e => e.Provider)
-                .Include(e => e.Location)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null) return NotFound();
@@ -64,12 +64,16 @@ namespace Bulihub_Backend.Controllers
                 Name = dto.PartyName,
                 Description = dto.Description,
                 StartDate = startDate,
-                EndDate = startDate.AddHours(4), // Alapértelmezett 4 órás időtartam
-                LocationName = dto.Location,
+                EndDate = startDate.AddHours(4), // Alapértelmezett 4 óra
+
+                // ***** Fontos: az új mezők
+                LocationName = dto.LocationName,
+                Address = dto.Address,
+                Equipment = dto.Equipment,
+
                 Guests = dto.Guests,
                 Theme = dto.Theme,
-                ProviderId = 0, // Mivel nincs szolgáltató kiválasztva az űrlapban
-                LocationId = 0, // Mivel nincs location azonosító
+                ProviderId = null,  // frontenden még nincsen kiválasztva
                 Status = "Upcoming"
             };
 
@@ -92,8 +96,13 @@ namespace Bulihub_Backend.Controllers
             existing.Description = updatedEvent.Description;
             existing.StartDate = updatedEvent.StartDate;
             existing.EndDate = updatedEvent.EndDate;
+
+            existing.LocationName = updatedEvent.LocationName;
+            existing.Address = updatedEvent.Address;
+            existing.Equipment = updatedEvent.Equipment;
+            existing.Guests = updatedEvent.Guests;
+            existing.Theme = updatedEvent.Theme;
             existing.ProviderId = updatedEvent.ProviderId;
-            existing.LocationId = updatedEvent.LocationId;
             existing.Status = updatedEvent.Status;
 
             await _context.SaveChangesAsync();

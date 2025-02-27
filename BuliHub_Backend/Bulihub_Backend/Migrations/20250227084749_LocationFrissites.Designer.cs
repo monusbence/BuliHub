@@ -4,6 +4,7 @@ using Bulihub_Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bulihub_Backend.Migrations
 {
     [DbContext(typeof(BuliHubDbContext))]
-    partial class BuliHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227084749_LocationFrissites")]
+    partial class LocationFrissites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,7 +171,7 @@ namespace Bulihub_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("ProviderId")
+                    b.Property<int>("ProviderId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -450,7 +453,9 @@ namespace Bulihub_Backend.Migrations
                 {
                     b.HasOne("Bulihub_Backend.Models.ServiceProvider", "Provider")
                         .WithMany()
-                        .HasForeignKey("ProviderId");
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Provider");
                 });

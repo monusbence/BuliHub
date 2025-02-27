@@ -14,8 +14,15 @@ namespace Bulihub_Backend.DTOs
         [JsonPropertyName("time")]
         public string Time { get; set; } = string.Empty;
 
-        [JsonPropertyName("location")]
-        public string Location { get; set; } = string.Empty;
+        [JsonPropertyName("locationName")]
+        public string LocationName { get; set; } = string.Empty;
+
+        // ÚJ mezők, amiket eddig a Location típusba raktunk
+        [JsonPropertyName("address")]
+        public string Address { get; set; } = string.Empty;
+
+        [JsonPropertyName("equipment")]
+        public string Equipment { get; set; } = string.Empty;
 
         [JsonPropertyName("guests")]
         public int Guests { get; set; }
@@ -27,3 +34,4 @@ namespace Bulihub_Backend.DTOs
         public string Description { get; set; } = string.Empty;
     }
 }
+

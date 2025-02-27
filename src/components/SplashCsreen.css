@@ -1,0 +1,53 @@
+/* Alap stílusok a splash screenhez */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000; /* Háttérszín */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Mindig legfelül legyen */
+  }
+  
+  .splash-logo {
+    width: 300px;
+    height: auto;
+    /* Tetszőleges animáció vagy átmenet jöhet ide */
+    animation: pulseAndFade 4s ease forwards;
+  }
+  
+  @keyframes pulseAndFade {
+    0% {
+      transform: scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    20% {
+      transform: scale(1.2);
+    }
+    25% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.2);
+    }
+    45% {
+      transform: scale(1);
+    }
+    60% {
+      transform: scale(1.2);
+    }
+    65% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+  

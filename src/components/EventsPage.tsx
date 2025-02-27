@@ -14,145 +14,11 @@ interface EventItem {
   organizer: string;
 }
 
-// 12 példa esemény dummy adat
-const DUMMY_EVENTS: EventItem[] = [
-  {
-    id: 1,
-    title: 'Nagy Nyári Fesztivál',
-    startDate: '2025-07-20',
-    endDate: '2025-07-22',
-    location: 'Budapest, Városliget',
-    category: 'Fesztivál',
-    imageUrl: 'https://picsum.photos/300/200?random=1',
-    description: 'Ez egy nagyszabású nyári fesztivál Budapesten.',
-    organizer: 'Fesztivál Szervezők',
-  },
-  {
-    id: 2,
-    title: 'Retro Disco Party',
-    startDate: '2025-07-22',
-    endDate: '2025-07-22',
-    location: 'Debrecen, Fő tér',
-    category: 'Party',
-    imageUrl: 'https://picsum.photos/300/200?random=2',
-    description: 'Egy retro disco buli a debreceni Fő téren.',
-    organizer: 'Party Crew',
-  },
-  {
-    id: 3,
-    title: 'Tech Konferencia',
-    startDate: '2025-08-05',
-    endDate: '2025-08-06',
-    location: 'Szeged, Konferencia Központ',
-    category: 'Konferencia',
-    imageUrl: 'https://picsum.photos/300/200?random=3',
-    description: 'A szegedi technológiai konferencia.',
-    organizer: 'Tech Innovators',
-  },
-  {
-    id: 4,
-    title: 'Koncert a Parkban',
-    startDate: '2025-08-10',
-    endDate: '2025-08-10',
-    location: 'Miskolc, Népkert',
-    category: 'Koncert',
-    imageUrl: 'https://picsum.photos/300/200?random=4',
-    description: 'Koncert a miskolci Népkertben.',
-    organizer: 'Live Music Agency',
-  },
-  {
-    id: 5,
-    title: 'Klasszikus Zenei Est',
-    startDate: '2025-09-01',
-    endDate: '2025-09-01',
-    location: 'Budapest, Operaház',
-    category: 'Klasszikus',
-    imageUrl: 'https://picsum.photos/300/200?random=5',
-    description: 'Klasszikus zenei előadás az Operaházban.',
-    organizer: 'Opera House',
-  },
-  {
-    id: 6,
-    title: 'Művészeti Kiállítás',
-    startDate: '2025-09-10',
-    endDate: '2025-09-15',
-    location: 'Pécs, Művészeti Múzeum',
-    category: 'Kiállítás',
-    imageUrl: 'https://picsum.photos/300/200?random=6',
-    description: 'Kortárs művészeti kiállítás Pécsett.',
-    organizer: 'Art Gallery',
-  },
-  {
-    id: 7,
-    title: 'Gasztronómiai Fesztivál',
-    startDate: '2025-10-05',
-    endDate: '2025-10-07',
-    location: 'Szeged, Fő tér',
-    category: 'Fesztivál',
-    imageUrl: 'https://picsum.photos/300/200?random=7',
-    description: 'Nemzetközi ízek fesztiválja.',
-    organizer: 'Foodies United',
-  },
-  {
-    id: 8,
-    title: 'Stand-Up Comedy Est',
-    startDate: '2025-11-01',
-    endDate: '2025-11-01',
-    location: 'Budapest, Színház',
-    category: 'Comedy',
-    imageUrl: 'https://picsum.photos/300/200?random=8',
-    description: 'Nevetés garantált a stand-up comedy esten.',
-    organizer: 'Comedy Club',
-  },
-  {
-    id: 9,
-    title: 'Interaktív Workshop',
-    startDate: '2025-11-10',
-    endDate: '2025-11-11',
-    location: 'Debrecen, Konferencia Központ',
-    category: 'Workshop',
-    imageUrl: 'https://picsum.photos/300/200?random=9',
-    description: 'Workshop különböző témákban.',
-    organizer: 'Workshop Masters',
-  },
-  {
-    id: 10,
-    title: 'Modern Tánc Előadás',
-    startDate: '2025-12-05',
-    endDate: '2025-12-05',
-    location: 'Miskolc, Táncház',
-    category: 'Tánc',
-    imageUrl: 'https://picsum.photos/300/200?random=10',
-    description: 'Innovatív koreográfia modern tánc előadása.',
-    organizer: 'Dance Company',
-  },
-  {
-    id: 11,
-    title: 'Irodalmi Est',
-    startDate: '2025-12-10',
-    endDate: '2025-12-10',
-    location: 'Budapest, Könyvtár',
-    category: 'Irodalom',
-    imageUrl: 'https://picsum.photos/300/200?random=11',
-    description: 'Kortárs írók mesélnek egy irodalmi esten.',
-    organizer: 'Literary Society',
-  },
-  {
-    id: 12,
-    title: 'Divatbemutató',
-    startDate: '2025-12-15',
-    endDate: '2025-12-15',
-    location: 'Debrecen, Vásárcsarnok',
-    category: 'Divat',
-    imageUrl: 'https://picsum.photos/300/200?random=12',
-    description: 'Év legdivatosabb bemutatója, friss trendekkel.',
-    organizer: 'Fashion Hub',
-  },
-];
-
 function EventsPage() {
   // Általános betöltési állapot
   const [isLoading, setIsLoading] = useState(true);
+  const [events, setEvents] = useState<EventItem[]>([]); // <-- A backendről jövő események itt tárolódnak
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -176,13 +42,48 @@ function EventsPage() {
   // A kiválasztott esemény a modalhoz
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
+  // ESEMÉNYEK LEKÉRÉSE A BACKENDRŐL
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('https://localhost:7248/api/Events', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Hiba az események lekérése közben: ${response.status} ${response.statusText}`);
+        }
+
+        // Válasz JSON
+        const data: any[] = await response.json(); // A valós adatszerkezet
+        // Mappelés a front-end által használt mezőkre
+        const mappedEvents: EventItem[] = data.map((ev: any) => ({
+          id: ev.id,
+          title: ev.name || 'Esemény címe',
+          startDate: ev.startDate || '',
+          endDate: ev.endDate || '',
+          location: ev.locationName || 'Ismeretlen helyszín',
+          category: ev.theme || 'Egyéb',  // Esetleg 'Fesztivál', 'Koncert' stb. ha a theme megfelel
+          imageUrl: `https://picsum.photos/300/200?random=${ev.id}`, // Ide tehetsz fix URL-t is
+          description: ev.description || '',
+          organizer: ev.provider?.user?.name ?? 'Ismeretlen szervező'
+          // Ha nincs Provider object, ez a szervező mező 'Ismeretlen szervező' lesz
+        }));
+
+        setEvents(mappedEvents);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
+  // Oldal újraméretezés figyelése
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
@@ -193,11 +94,12 @@ function EventsPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Az események szűrése a beállított feltételek alapján
-  const filteredEvents = DUMMY_EVENTS.filter((event) => {
+  // Események szűrése a beállított feltételek alapján
+  const filteredEvents = events.filter((event) => {
     const matchKeyword =
       event.title.toLowerCase().includes(keyword.toLowerCase()) ||
       event.location.toLowerCase().includes(keyword.toLowerCase());
+
     const matchCategory = category ? event.category === category : true;
     const matchFromDate = fromDate ? new Date(event.startDate) >= new Date(fromDate) : true;
     const matchToDate = toDate ? new Date(event.startDate) <= new Date(toDate) : true;
@@ -207,11 +109,15 @@ function EventsPage() {
     const matchOrganizer = organizerFilter
       ? event.organizer.toLowerCase().includes(organizerFilter.toLowerCase())
       : true;
+
+    // upcoming / past
     const now = new Date();
     const eventStart = new Date(event.startDate);
     const matchUpcoming = upcoming ? eventStart >= now : true;
     const eventEnd = new Date(event.endDate);
     const matchPast = past ? eventEnd < now : true;
+
+    // időtartam-szűrés
     const durationInDays =
       (new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / (1000 * 3600 * 24) + 1;
     const matchMinDuration = minDuration ? durationInDays >= parseInt(minDuration) : true;
@@ -242,6 +148,7 @@ function EventsPage() {
   return (
     <div className="page-container">
       <div className="content-wrapper">
+        {/* Oldalsó menü */}
         <aside className={`sidebar-nav ${isSidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-content">
             <div className="sidebar-logo">
@@ -282,6 +189,7 @@ function EventsPage() {
           </button>
         </aside>
 
+        {/* Fő tartalom */}
         <main className="events-main-content">
           <h1>Események</h1>
           <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
@@ -309,7 +217,7 @@ function EventsPage() {
               <option value="Divat">Divat</option>
             </select>
             <button onClick={() => setShowDetailedFilters(!showDetailedFilters)}>
-              {showDetailedFilters ? 'Alap szűrés' : 'Reszletes szűrés'}
+              {showDetailedFilters ? 'Alap szűrés' : 'Részletes szűrés'}
             </button>
 
             {showDetailedFilters && (
