@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Navbar from './components/navbar';
+import Footer from './components/footer';
 import SplashScreen from './components/SplashScreen';
 import HeroSection from './components/HeroSection';
 import StatisticsSection from './components/StatisticsSection';
@@ -27,7 +27,7 @@ function App() {
   // REGISZTRÁCIÓS MODAL
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  // Telefongörgetés (section1)
+  // Telefongörgetés (HeroSection "telefon") – kezdetben zárt/locked
   const [locked, setLocked] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -45,31 +45,36 @@ function App() {
     }
   }, []);
 
-  // Egérgörgő-kezelés a telefon \"feloldásához\"
+  // Egérgörgő-kezelés a telefon "feloldásához"
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      const SCROLL_DISTANCE = 500;
+      const SCROLL_DISTANCE = 500; // görgetés érzékenység
       const delta = e.deltaY;
+
       if (locked) {
+        // Ha még "zárva" van a telefon, ne a teljes oldal scrollozzon,
+        // hanem a progress-szel mozgassuk a telefon forgását
         e.preventDefault();
         const newProgress = progress + delta / SCROLL_DISTANCE;
         const clampedProgress = Math.max(0, Math.min(1, newProgress));
         setProgress(clampedProgress);
-        if (clampedProgress >= 1) setLocked(false);
+        if (clampedProgress >= 1) setLocked(false); // feloldás
       } else {
+        // Ha a telefon már "nyitva" van:
+        // visszagördüléskor zárjon be, ha a felhasználó felgörget nullára
         if (window.scrollY === 0 && delta < 0 && progress > 0) {
           e.preventDefault();
           const newProgress = progress + delta / SCROLL_DISTANCE;
           const clampedProgress = Math.max(0, Math.min(1, newProgress));
           setProgress(clampedProgress);
-          if (clampedProgress <= 0) setLocked(true);
+          if (clampedProgress <= 0) setLocked(true); // újra lezár
         }
       }
     },
     [locked, progress]
   );
 
-  // -15 -> 0 fokos forgatás
+  // -15 -> 0 fokos forgatás a telefonképhez
   const rotateAngle = -15 + (0 - -15) * progress;
 
   // Bejelentkezés
@@ -86,6 +91,7 @@ function App() {
         alert('Bejelentkezés sikertelen: ' + errorText);
       } else {
         const data = await response.json();
+        // JWT és név mentése
         localStorage.setItem('jwtToken', data.token);
         localStorage.setItem('user', JSON.stringify({ fullName: data.name }));
         setUser({ fullName: data.name });
@@ -111,12 +117,17 @@ function App() {
       <AnimatePresence>{showSplash && <SplashScreen />}</AnimatePresence>
 
       {/* Főkonténer */}
-      <div className={`app-container ${showSplash ? 'hidden' : ''}`} onWheel={handleWheel}>
+      <div
+        className={`app-container ${showSplash ? 'hidden' : ''}`}
+        onWheel={handleWheel}
+      >
         {/* Felső navigáció */}
         <Navbar
           user={user}
           onLogout={handleLogout}
           onRegisterClick={() => setIsRegisterModalOpen(true)}
+          isMenuOpen={false}
+          toggleMenu={() => null}
         />
 
         {/* 1. Szekció - Hero rész + bejelentkezés */}
@@ -134,9 +145,16 @@ function App() {
         <StatisticsSection />
 
         {/* 3. Szekció - Esemény létrehozása */}
-        <CreateEventForm user={user} />
+        {user ? (
+          <CreateEventForm user={user} />
+        ) : (
+          <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+            <h2>Új buli létrehozása csak bejelentkezett felhasználóknak!</h2>
+            <p>Kérjük, jelentkezz be, vagy regisztrálj.</p>
+          </div>
+        )}
 
-        {/* Lábléc (már megvolt Footer.tsx néven) */}
+        {/* Lábléc */}
         {!showSplash && <Footer />}
       </div>
 

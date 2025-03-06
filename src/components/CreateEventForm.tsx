@@ -26,25 +26,40 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Ha nincs bejelentkezve a user, letiltjuk a létrehozást.
     if (!user) {
       alert('Jelentkezz be, hogy létrehozhass egy bulit!');
       return;
     }
+
+    // JWT token kikérése a localStorage-ból:
+    const token = localStorage.getItem('jwtToken');
+
+    // Összeállítjuk a buli adatait:
     const eventData = {
       partyName: formData.partyName,
       date: formData.date,
       time: formData.time,
       location: formData.location,
+      address: formData.address,
+      equipment: formData.equipment,
       guests: parseInt(formData.guests, 10),
       theme: formData.theme,
       description: formData.description,
     };
+
     try {
       const response = await fetch('https://localhost:7248/api/Events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          // A Bearer token használata
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(eventData),
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         alert('Hiba történt az esemény létrehozása során: ' + errorText);
@@ -55,6 +70,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       console.error('Hiba az esemény létrehozása során:', error);
       alert('Hiba történt az esemény létrehozása során');
     }
+
+    // Mezők törlése a formban
     setFormData({
       partyName: '',
       date: '',
@@ -74,6 +91,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
         <div className="left-side">
           <h2>Hozz létre egy bulit!</h2>
           <p>Töltsd ki az alábbi űrlapot a buli részleteivel.</p>
+
           <form className="party-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="partyName">Buli neve</label>
@@ -190,7 +208,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
                 placeholder="Írj egy rövid leírást a buliról..."
                 value={formData.description}
                 onChange={handleInputChange}
-              ></textarea>
+              />
             </div>
 
             <button type="submit" className="btn submit-btn">
