@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 interface HeroSectionProps {
-  isMobile: boolean;
   loginEmail?: string;
   loginPassword?: string;
   setLoginEmail?: React.Dispatch<React.SetStateAction<string>>;
@@ -12,7 +11,6 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
-  isMobile,
   loginEmail = '',
   loginPassword = '',
   setLoginEmail = () => {},
@@ -20,11 +18,30 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   handleLogin = () => {},
   onRegisterClick
 }) => {
-  // Ha mobil, egyszerű bejelentkező form, ha nem mobil, akkor a forgó telefon
-  if (isMobile) {
+  // ÚJ: lokális state, figyeli a képernyőméretet. Ha <= 767, mobileMode = true.
+  const [mobileMode, setMobileMode] = useState(false);
+
+  useEffect(() => {
+    // Méretellenőrzés induláskor
+    const checkWidth = () => {
+      if (window.innerWidth <= 767) {
+        setMobileMode(true);
+      } else {
+        setMobileMode(false);
+      }
+    };
+    checkWidth();
+
+    // Eseményfigyelő: minden ablakméret-változásnál
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
+  }, []);
+
+  // Ha mobil nézet (<= 767px): egyszerű bejelentkező form
+  if (mobileMode) {
     return (
       <section id="section1" style={{ padding: '2rem', textAlign: 'center' }}>
-        <h1>Üdvözöllek a BuliHub oldalán (Mobile)!</h1>
+        <h1>Üdvözöllek a BuliHub oldalán!</h1>
         <div style={{ maxWidth: '400px', margin: '0 auto', marginTop: '2rem' }}>
           <h2>Bejelentkezés</h2>
           <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
@@ -66,6 +83,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             Bejelentkezés
           </button>
           <div style={{ marginBottom: '1rem' }}>
+          <a href="#" className="forgot-link">
+                Elfelejtetted a jelszavad?
+              </a>
+              <br />
             <a href="#" onClick={onRegisterClick} style={{ color: '#0af' }}>
               Regisztrálj új fiókot
             </a>
@@ -73,8 +94,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       </section>
     );
-  } else {
-    // DESKTOP: marad a forgó telefonos layout
+  } 
+  // DESKTOP nézet: marad a forgó telefonos layout
+  else {
     const rotateAngle = 0; // Ha korábban volt progress, a forgás mértékét onnan vehetnéd
     return (
       <section id="section1">

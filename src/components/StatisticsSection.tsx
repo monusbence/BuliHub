@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
+// EREDMÉNY: nem használunk interface-t, ezért töröljük az eredeti interface-t
+
+// Az eredeti animációs config:
 const leftCardVariants = {
   initial: { x: 0, opacity: 0 },
   animate: { x: -350, opacity: 1, transition: { duration: 1 } },
@@ -18,9 +21,32 @@ const centerCardVariants = {
   animate: { x: 0, opacity: 1 },
 };
 
+/**
+ * Ha mobil nézet: nincs motion, kártyák egymás alatt.
+ * Ha nem mobil: a teljes eredeti animációs kód fut.
+ */
 const StatisticsSection: React.FC = () => {
+  // Eredeti statek
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const section2Ref = useRef<HTMLDivElement | null>(null);
+
+  // ÚJ: mobil nézet figyelése. Ha <= 767px, mobileMode=1, külön layout.
+  const [mobileMode, setMobileMode] = useState(0);
+
+  useEffect(() => {
+    // Első ellenőrzés és a resize figyelése
+    const checkWidth = () => {
+      if (window.innerWidth <= 767) {
+        setMobileMode(1);
+      } else {
+        setMobileMode(0);
+      }
+    };
+    checkWidth();
+
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -45,6 +71,40 @@ const StatisticsSection: React.FC = () => {
     };
   }, [cardsExpanded]);
 
+  // 🔹 Ha mobilMode===1: nincs motion, kártyák egymás alá
+  if (mobileMode === 1) {
+    return (
+      <section id="section2" ref={section2Ref}>
+        <div
+          className="cards-container"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            marginTop: '2rem'
+          }}
+        >
+          <div className="card left-card">
+            <h2 className="gradient-number">+200</h2>
+            <p>Meghirdetett esemény hetente</p>
+          </div>
+
+          <div className="card center-card">
+            <h2 className="gradient-number">+500</h2>
+            <p>Ellenőrzött vélemény</p>
+          </div>
+
+          <div className="card right-card">
+            <h2 className="gradient-number">+1000</h2>
+            <p>Eladott jegyek hetente</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // 🔹 Asztali nézet: az EREDETI, változatlan kód
   return (
     <section id="section2" ref={section2Ref}>
       <div

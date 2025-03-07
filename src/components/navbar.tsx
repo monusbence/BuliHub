@@ -1,27 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Navbar.css";
 
 interface NavbarProps {
-  user: { fullName: string } | null;
-  isMenuOpen: boolean;
-  toggleMenu: () => void;
-  onLogout: () => void;
-  onRegisterClick: () => void;
+  user?: { fullName: string } | null;
+  onLogout?: () => void;
+  onRegisterClick?: () => void;
 }
 
+/**
+ * Általános felső navbar, hamburger menüvel mobil nézetben.
+ */
 const Navbar: React.FC<NavbarProps> = ({
   user,
-  isMenuOpen,
-  toggleMenu,
-  onLogout,
-  onRegisterClick,
+  onLogout = () => {},
+  onRegisterClick = () => {},
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <nav className="navbar">
+      {/* Logo */}
       <div className="logo">
         <img src="./kepek_jegyzetek/MainLogo(png).png" alt="BuliHub Logo" />
       </div>
 
+      {/* Hamburger ikon */}
       <div
         className={`hamburger ${isMenuOpen ? "active" : ""}`}
         onClick={toggleMenu}
@@ -31,9 +38,10 @@ const Navbar: React.FC<NavbarProps> = ({
         <span></span>
       </div>
 
+      {/* Linkek */}
       <ul className={`nav-links ${isMenuOpen ? "open" : ""}`}>
         <li>
-          <a href="#section1" onClick={toggleMenu}>
+          <a href="/" onClick={toggleMenu}>
             Főoldal
           </a>
         </li>
@@ -53,6 +61,7 @@ const Navbar: React.FC<NavbarProps> = ({
             onClick={(e) => {
               e.preventDefault();
               onRegisterClick();
+              toggleMenu();
             }}
           >
             Regisztráció
@@ -60,6 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({
         </li>
       </ul>
 
+      {/* Bejelentkezett felhasználó (jobbra igazítva) */}
       {user && (
         <div className="user-info">
           <span>{user.fullName}</span>
