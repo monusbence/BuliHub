@@ -2,91 +2,119 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 interface HeroSectionProps {
+  rotateAngle?: number;
   loginEmail?: string;
   loginPassword?: string;
   setLoginEmail?: React.Dispatch<React.SetStateAction<string>>;
   setLoginPassword?: React.Dispatch<React.SetStateAction<string>>;
   handleLogin?: () => void;
   onRegisterClick: () => void;
+  user?: { fullName: string } | null;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
+  rotateAngle = 0,
   loginEmail = '',
   loginPassword = '',
   setLoginEmail = () => {},
   setLoginPassword = () => {},
   handleLogin = () => {},
-  onRegisterClick
+  onRegisterClick,
+  user = null,
 }) => {
-  // ÚJ: lokális state, figyeli a képernyőméretet. Ha <= 767, mobileMode = true.
   const [mobileMode, setMobileMode] = useState(false);
 
   useEffect(() => {
-    // Méretellenőrzés induláskor
     const checkWidth = () => {
-      if (window.innerWidth <= 767) {
-        setMobileMode(true);
-      } else {
-        setMobileMode(false);
-      }
+      setMobileMode(window.innerWidth <= 767);
     };
     checkWidth();
-
-    // Eseményfigyelő: minden ablakméret-változásnál
     window.addEventListener('resize', checkWidth);
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
-  // Ha mobil nézet (<= 767px): egyszerű bejelentkező form
+  // Egy közös keyDown kezelő, amely az Enter lenyomása esetén meghívja a handleLogin függvényt.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
+  // Közös logged-in üzenet stílus (desktop és mobil esetén)
+  const loggedInMessage = (
+    <div
+      style={{
+        backgroundColor: '#333',
+        padding: '1rem',
+        borderRadius: '8px',
+        textAlign: 'center',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        marginTop: '1rem',
+      }}
+    >
+      <h3 style={{ margin: '0', color: '#c841c6' }}>Üdvözlünk!</h3>
+      <p style={{ margin: '0.5rem 0 0', fontWeight: 'bold', color: '#f8f8f8' }}>
+        Már be vagy jelentkezve, {user?.fullName}!
+      </p>
+    </div>
+  );
+
   if (mobileMode) {
     return (
       <section id="section1" style={{ padding: '2rem', textAlign: 'center' }}>
         <h1>Üdvözöllek a BuliHub oldalán!</h1>
         <div style={{ maxWidth: '400px', margin: '0 auto', marginTop: '2rem' }}>
           <h2>Bejelentkezés</h2>
-          <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-            <label htmlFor="mobile-email">Email</label>
-            <input
-              type="email"
-              id="mobile-email"
-              style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
-              placeholder="Add meg az e-mail címed"
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-            />
-          </div>
-          <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-            <label htmlFor="mobile-password">Jelszó</label>
-            <input
-              type="password"
-              id="mobile-password"
-              style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
-              placeholder="Add meg a jelszavad"
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            style={{
-              width: '100%',
-              padding: '0.8rem',
-              backgroundColor: '#c841c6',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              marginBottom: '1rem',
-              fontWeight: 'bold',
-            }}
-            onClick={handleLogin}
-          >
-            Bejelentkezés
-          </button>
+          {user ? (
+            loggedInMessage
+          ) : (
+            <>
+              <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                <label htmlFor="mobile-email">Email</label>
+                <input
+                  type="email"
+                  id="mobile-email"
+                  style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
+                  placeholder="Add meg az e-mail címed"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                <label htmlFor="mobile-password">Jelszó</label>
+                <input
+                  type="password"
+                  id="mobile-password"
+                  style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
+                  placeholder="Add meg a jelszavad"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <button
+                style={{
+                  width: '100%',
+                  padding: '0.8rem',
+                  backgroundColor: '#c841c6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '5px',
+                  marginBottom: '1rem',
+                  fontWeight: 'bold',
+                }}
+                onClick={handleLogin}
+              >
+                Bejelentkezés
+              </button>
+            </>
+          )}
           <div style={{ marginBottom: '1rem' }}>
-          <a href="#" className="forgot-link">
-                Elfelejtetted a jelszavad?
-              </a>
-              <br />
+            <a href="#" className="forgot-link">
+              Elfelejtetted a jelszavad?
+            </a>
+            <br />
             <a href="#" onClick={onRegisterClick} style={{ color: '#0af' }}>
               Regisztrálj új fiókot
             </a>
@@ -94,10 +122,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       </section>
     );
-  } 
-  // DESKTOP nézet: marad a forgó telefonos layout
-  else {
-    const rotateAngle = 0; // Ha korábban volt progress, a forgás mértékét onnan vehetnéd
+  } else {
     return (
       <section id="section1">
         <div className="section1-content">
@@ -108,8 +133,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               <img src="./src/app-storee.png" alt="App Store" className="store-icon" />
             </div>
           </div>
-
-          {/* Telefon keret Framer Motion animációval */}
           <motion.div
             className="telokeret"
             animate={{ rotate: rotateAngle }}
@@ -121,37 +144,40 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 <div className="camera-dot"></div>
               </div>
             </div>
-
             <div className="phone-screen">
               <img src="./kepek_jegyzetek/MainLogo(png).png" alt="logo" className="logo-img" />
               <h2 className="login-title">Bejelentkezés</h2>
-
-              <div className="input-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Add meg az e-mail címed"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="password">Jelszó</label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Add meg a jelszavad"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                />
-              </div>
-
-              <button className="btn login-btn" onClick={handleLogin}>
-                Bejelentkezés
-              </button>
-
+              {user ? (
+                loggedInMessage
+              ) : (
+                <>
+                  <div className="input-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      placeholder="Add meg az e-mail címed"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label htmlFor="password">Jelszó</label>
+                    <input
+                      type="password"
+                      id="password"
+                      placeholder="Add meg a jelszavad"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                    />
+                  </div>
+                  <button className="btn login-btn" onClick={handleLogin}>
+                    Bejelentkezés
+                  </button>
+                </>
+              )}
               <a href="#" className="forgot-link">
                 Elfelejtetted a jelszavad?
               </a>
@@ -159,7 +185,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 Regisztrálj új fiókot
               </a>
             </div>
-
             <div className="bottom-bar">
               <div className="home-indicator"></div>
             </div>

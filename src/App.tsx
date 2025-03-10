@@ -10,34 +10,34 @@ import RegisterModal from './components/RegisterModal';
 import './App.css';
 
 function App() {
-  // SPLASH SCREEN állapot
+  // Splash screen állapot
   const [showSplash, setShowSplash] = useState(true);
 
-  // FELHASZNÁLÓ
+  // Felhasználó
   const [user, setUser] = useState<{ fullName: string } | null>(null);
 
-  // BEJELENTKEZÉS mezők
+  // Bejelentkezési mezők
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  // Sikeres login overlay
+  // Sikeres bejelentkezés overlay
   const [loginSuccessMessage, setLoginSuccessMessage] = useState(false);
   const [loginSuccessName, setLoginSuccessName] = useState('');
 
-  // REGISZTRÁCIÓS MODAL
+  // Regisztrációs modal
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  // Telefongörgetés (HeroSection "telefon") – kezdetben zárt/locked
+  // Telefongörgetés állapot (progress és locked)
   const [locked, setLocked] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  // SPLASH SCREEN eltüntetése 4 mp után
+  // Splash screen eltüntetése 4 mp után
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Betöltjük a user adatait localStorage-ból, ha volt
+  // User adatok betöltése a localStorage-ból
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -45,36 +45,48 @@ function App() {
     }
   }, []);
 
-  // Egérgörgő-kezelés a telefon "feloldásához"
+  // Amíg a telefon nincs feloldva (locked), letiltjuk az oldal görgetését
+  useEffect(() => {
+    if (locked) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [locked]);
+
+  // Görgetés kezelés: a telefon forgatása a progress alapján
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      const SCROLL_DISTANCE = 500; // görgetés érzékenység
+      const SCROLL_DISTANCE = 500; // görgetési érzékenység
       const delta = e.deltaY;
 
       if (locked) {
-        // Ha még "zárva" van a telefon, ne a teljes oldal scrollozzon,
-        // hanem a progress-szel mozgassuk a telefon forgását
+        // Ha a telefon még "zárva" van, letiltjuk a sima scroll-t,
+        // és a progress alapján forgatjuk a telefont
         e.preventDefault();
         const newProgress = progress + delta / SCROLL_DISTANCE;
         const clampedProgress = Math.max(0, Math.min(1, newProgress));
         setProgress(clampedProgress);
-        if (clampedProgress >= 1) setLocked(false); // feloldás
+        if (clampedProgress >= 1) setLocked(false); // feloldás, ha a progress eléri az 1-et
       } else {
-        // Ha a telefon már "nyitva" van:
-        // visszagördüléskor zárjon be, ha a felhasználó felgörget nullára
+        // Ha a telefon már fel van oldva:
+        // visszagördülés esetén, ha a scroll tetején vagyunk, újra zárhatjuk
         if (window.scrollY === 0 && delta < 0 && progress > 0) {
           e.preventDefault();
           const newProgress = progress + delta / SCROLL_DISTANCE;
           const clampedProgress = Math.max(0, Math.min(1, newProgress));
           setProgress(clampedProgress);
-          if (clampedProgress <= 0) setLocked(true); // újra lezár
+          if (clampedProgress <= 0) setLocked(true);
         }
       }
     },
     [locked, progress]
   );
 
-  // -15 -> 0 fokos forgatás a telefonképhez
+  // A telefon forgatása -15°-tól 0°-ig a progress alapján
   const rotateAngle = -15 + (0 - -15) * progress;
 
   // Bejelentkezés
@@ -91,7 +103,6 @@ function App() {
         alert('Bejelentkezés sikertelen: ' + errorText);
       } else {
         const data = await response.json();
-        // JWT és név mentése
         localStorage.setItem('jwtToken', data.token);
         localStorage.setItem('user', JSON.stringify({ fullName: data.name }));
         setUser({ fullName: data.name });
@@ -113,7 +124,7 @@ function App() {
 
   return (
     <>
-      {/* SplashScreen */}
+      {/* Splash Screen */}
       <AnimatePresence>{showSplash && <SplashScreen />}</AnimatePresence>
 
       {/* Főkonténer */}
@@ -121,7 +132,7 @@ function App() {
         className={`app-container ${showSplash ? 'hidden' : ''}`}
         onWheel={handleWheel}
       >
-        {/* Felső navigáció */}
+        {/* Navbar */}
         <Navbar
           user={user}
           onLogout={handleLogout}
@@ -130,7 +141,7 @@ function App() {
           toggleMenu={() => null}
         />
 
-        {/* 1. Szekció - Hero rész + bejelentkezés */}
+        {/* Hero Section - itt történik a forgó telefon animációja */}
         <HeroSection
           rotateAngle={rotateAngle}
           loginEmail={loginEmail}
@@ -139,12 +150,13 @@ function App() {
           setLoginPassword={setLoginPassword}
           handleLogin={handleLogin}
           onRegisterClick={() => setIsRegisterModalOpen(true)}
+          user={user}
         />
 
-        {/* 2. Szekció - Animált statisztikák */}
+        {/* Statisztikák */}
         <StatisticsSection />
 
-        {/* 3. Szekció - Esemény létrehozása */}
+        {/* Esemény létrehozása */}
         {user ? (
           <CreateEventForm user={user} />
         ) : (
@@ -165,7 +177,7 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Sikeres bejelentkezés értesítő overlay */}
+      {/* Sikeres bejelentkezés overlay */}
       <AnimatePresence>
         {loginSuccessMessage && (
           <div className="login-success-overlay">
