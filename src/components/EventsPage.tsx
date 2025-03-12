@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Footer from './footer';
 import Navbar from './navbar';
-import RegisterModal from './RegisterModal'; // Ellenőrizd a helyes útvonalat!
+import RegisterModal from './RegisterModal';
 import './EventsPage.css';
-import { color } from 'framer-motion';
 
 // Segédfüggvény az időpont formázásához (pl. 2025.12.09 19:30)
 function formatDateTime(dateString: string): string {
@@ -19,7 +18,7 @@ function formatDateTime(dateString: string): string {
 
 interface EventItem {
   id: number;
-  title: string;        // frontend: a buli neve (a backend értéke a Name, de itt "title")
+  title: string;        // frontend: a buli neve (backend: Name)
   description: string;
   startDate: string;
   endDate: string;
@@ -27,17 +26,17 @@ interface EventItem {
   address: string;      // backend: address
   equipment: string;    // backend: equipment
   organizer: string;    // backend: organizerName
-  category: string;     // frontend: kategória, de a backend a "Theme"-et várja
+  category: string;     // frontend: kategória (backend: Theme)
   imageUrl: string;
   guests: number;
 }
 
 const EventsPage: React.FC = () => {
-  // Állapotok az események lekéréséhez és megjelenítéséhez
+  // Állapotok az események és betöltés kezelésére
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
 
-  // Szűréshez használt state-ek
+  // Szűrőmezők
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
@@ -49,15 +48,12 @@ const EventsPage: React.FC = () => {
   const [past, setPast] = useState(false);
   const [minDuration, setMinDuration] = useState('');
   const [maxDuration, setMaxDuration] = useState('');
-  // Saját bulik szűrésére
+  // Saját bulik jelölő
   const [myEvents, setMyEvents] = useState(false);
 
-  // Részletező modal az eseményekhez
+  // Modálok
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
-  // Szerkesztési modal a saját buli módosításához
   const [editEvent, setEditEvent] = useState<EventItem | null>(null);
-
-  // Regisztrációs modal state
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   // A bejelentkezett felhasználó kinyerése a localStorage-ből
@@ -71,13 +67,13 @@ const EventsPage: React.FC = () => {
       try {
         const response = await fetch('https://localhost:7248/api/Events', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         });
         if (!response.ok) {
           throw new Error(`Hiba: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
-        console.log('=== DEBUG: Raw events from server ===', data);
+        console.log('=== DEBUG: Raw events ===', data);
         const mapped: EventItem[] = data.map((ev: any) => ({
           id: ev.id,
           title: ev.name || 'Esemény címe',
@@ -90,7 +86,7 @@ const EventsPage: React.FC = () => {
           organizer: ev.organizerName || 'Ismeretlen szervező',
           category: ev.theme || 'Egyéb',
           imageUrl: `https://picsum.photos/300/200?random=${ev.id}`,
-          guests: ev.guests || 0
+          guests: ev.guests || 0,
         }));
         console.log('=== DEBUG: Mapped events ===', mapped);
         setEvents(mapped);
@@ -127,7 +123,9 @@ const EventsPage: React.FC = () => {
     const matchMinDuration = minDuration ? durationInDays >= parseInt(minDuration) : true;
     const matchMaxDuration = maxDuration ? durationInDays <= parseInt(maxDuration) : true;
     const matchMyEvents = myEvents
-      ? (currentUser ? event.organizer.toLowerCase() === currentUser.fullName.toLowerCase() : false)
+      ? currentUser
+        ? event.organizer.toLowerCase() === currentUser.fullName.toLowerCase()
+        : false
       : true;
 
     return (
@@ -147,7 +145,7 @@ const EventsPage: React.FC = () => {
 
   // Törlés (DELETE)
   const handleDelete = async (eventId: number) => {
-    if (!window.confirm("Biztosan törlöd ezt az eseményt?")) return;
+    if (!window.confirm('Biztosan törlöd ezt az eseményt?')) return;
     const token = localStorage.getItem('jwtToken');
     try {
       const response = await fetch(`https://localhost:7248/api/Events/${eventId}`, {
@@ -155,16 +153,16 @@ const EventsPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
       if (response.ok) {
-        setEvents(prev => prev.filter(e => e.id !== eventId));
+        setEvents((prev) => prev.filter((e) => e.id !== eventId));
       } else {
         const errorText = await response.text();
-        alert("Hiba a törlés során: " + errorText);
+        alert('Hiba a törlés során: ' + errorText);
       }
     } catch (error) {
-      console.error("Törlési hiba:", error);
+      console.error('Törlési hiba:', error);
     }
   };
 
@@ -191,32 +189,38 @@ const EventsPage: React.FC = () => {
           Theme: updated.category,
           OrganizerName: updated.organizer,
           ProviderId: 0,
-          Status: "Upcoming"
-        })
+          Status: 'Upcoming',
+        }),
       });
       if (response.ok) {
         const data = await response.json();
-        setEvents(prev => prev.map(e => e.id === data.id ? {
-          id: data.id,
-          title: data.name,
-          description: data.description,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          location: data.locationName,
-          address: data.address,
-          equipment: data.equipment,
-          organizer: data.organizerName,
-          category: data.theme,
-          imageUrl: e.imageUrl,
-          guests: data.guests
-        } : e));
+        setEvents((prev) =>
+          prev.map((e) =>
+            e.id === data.id
+              ? {
+                  id: data.id,
+                  title: data.name,
+                  description: data.description,
+                  startDate: data.startDate,
+                  endDate: data.endDate,
+                  location: data.locationName,
+                  address: data.address,
+                  equipment: data.equipment,
+                  organizer: data.organizerName,
+                  category: data.theme,
+                  imageUrl: e.imageUrl,
+                  guests: data.guests,
+                }
+              : e
+          )
+        );
         setEditEvent(null);
       } else {
         const errorText = await response.text();
-        alert("Hiba a módosítás során: " + errorText);
+        alert('Hiba a módosítás során: ' + errorText);
       }
     } catch (error) {
-      console.error("Frissítési hiba:", error);
+      console.error('Frissítési hiba:', error);
     }
   };
 
@@ -249,22 +253,11 @@ const EventsPage: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Buli neve:</label>
-              <input
-                type="text"
-                name="title"
-                value={editData.title}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="title" value={editData.title} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Leírás:</label>
-              <textarea
-                name="description"
-                value={editData.description}
-                onChange={handleChange}
-                required
-              />
+              <textarea name="description" value={editData.description} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Kezdés:</label>
@@ -274,10 +267,7 @@ const EventsPage: React.FC = () => {
                 value={new Date(editData.startDate).toISOString().slice(0, 16)}
                 onChange={(e) => {
                   const newStart = new Date(e.target.value);
-                  setEditData((prev) => ({
-                    ...prev,
-                    startDate: newStart.toISOString(),
-                  }));
+                  setEditData((prev) => ({ ...prev, startDate: newStart.toISOString() }));
                 }}
                 required
               />
@@ -290,74 +280,42 @@ const EventsPage: React.FC = () => {
                 value={new Date(editData.endDate).toISOString().slice(0, 16)}
                 onChange={(e) => {
                   const newEnd = new Date(e.target.value);
-                  setEditData((prev) => ({
-                    ...prev,
-                    endDate: newEnd.toISOString(),
-                  }));
+                  setEditData((prev) => ({ ...prev, endDate: newEnd.toISOString() }));
                 }}
                 required
               />
             </div>
             <div className="form-group">
               <label>Helyszín:</label>
-              <input
-                type="text"
-                name="location"
-                value={editData.location}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="location" value={editData.location} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Cím:</label>
-              <input
-                type="text"
-                name="address"
-                value={editData.address}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="address" value={editData.address} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Extrák:</label>
-              <input
-                type="text"
-                name="equipment"
-                value={editData.equipment}
-                onChange={handleChange}
-              />
+              <input type="text" name="equipment" value={editData.equipment} onChange={handleChange} />
             </div>
             <div className="form-group">
               <label>Vendégek száma:</label>
-              <input
-                type="number"
-                name="guests"
-                value={editData.guests}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" name="guests" value={editData.guests} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Téma:</label>
-              <input
-                type="text"
-                name="category"
-                value={editData.category}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="category" value={editData.category} onChange={handleChange} required />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
               <button
-              className='save'
                 type="submit"
+                style={{ backgroundColor: 'yellow', padding: '0.5rem 1rem', border: 'none', cursor: 'pointer' }}
               >
                 Mentés
               </button>
               <button
-              className='cancel'
                 type="button"
                 onClick={onClose}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', backgroundColor: '#ccc', border: 'none' }}
               >
                 Mégse
               </button>
@@ -378,13 +336,12 @@ const EventsPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <Navbar onRegisterClick={() => setIsRegisterModalOpen(true)} />
+      <Navbar user={currentUser} onRegisterClick={() => setIsRegisterModalOpen(true)} />
 
       <main className="events-main-content">
         <h1>Események</h1>
         <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
 
-        {/* Szűrősáv */}
         <div className="filter-bar">
           <input
             type="text"
@@ -406,10 +363,23 @@ const EventsPage: React.FC = () => {
             <option value="Irodalom">Irodalom</option>
             <option value="Divat">Divat</option>
           </select>
+
+          {/* Saját bulik – mindig látható */}
+          <label>
+            <input
+              type="checkbox"
+              checked={myEvents}
+              onChange={(e) => setMyEvents(e.target.checked)}
+            />
+            Saját bulik
+          </label>
+
+          {/* Részletes szűrés gomb */}
           <button onClick={() => setShowDetailedFilters(!showDetailedFilters)}>
             {showDetailedFilters ? 'Alap szűrés' : 'Részletes szűrés'}
           </button>
 
+          {/* Részletes szűrés mezői */}
           {showDetailedFilters && (
             <>
               <input
@@ -452,14 +422,6 @@ const EventsPage: React.FC = () => {
                 />
                 Lejárt
               </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={myEvents}
-                  onChange={(e) => setMyEvents(e.target.checked)}
-                />
-                Saját bulik
-              </label>
               <input
                 type="number"
                 placeholder="Min. napok száma"
@@ -476,7 +438,6 @@ const EventsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Eseménykártyák */}
         <div className="events-grid">
           {filteredEvents.length === 0 ? (
             <p>Nincs megjeleníthető esemény a szűrésnek megfelelően.</p>
@@ -510,23 +471,23 @@ const EventsPage: React.FC = () => {
                     >
                       Részletek
                     </button>
-
-                    {currentUser && currentUser.fullName.toLowerCase() === event.organizer.toLowerCase() && (
-                      <>
-                        <button
-                          className="btn-details edit-button"
-                          onClick={() => setEditEvent(event)}
-                        >
-                          Módosítás
-                        </button>
-                        <button
-                          className="btn-details delete-button"
-                          onClick={() => handleDelete(event.id)}
-                        >
-                          Törlés
-                        </button>
-                      </>
-                    )}
+                    {currentUser &&
+                      currentUser.fullName.toLowerCase() === event.organizer.toLowerCase() && (
+                        <>
+                          <button
+                            className="btn-details edit-button"
+                            onClick={() => setEditEvent(event)}
+                          >
+                            Módosítás
+                          </button>
+                          <button
+                            className="btn-details delete-button"
+                            onClick={() => handleDelete(event.id)}
+                          >
+                            Törlés
+                          </button>
+                        </>
+                      )}
                   </div>
                 </div>
               </div>
@@ -539,11 +500,6 @@ const EventsPage: React.FC = () => {
       {selectedEvent && (
         <div className="modal">
           <div className="modal-content">
-            <img
-              src={selectedEvent.imageUrl}
-              alt={selectedEvent.title}
-              style={{ width: '100%', marginBottom: '1rem' }}
-            />
             <h2>{selectedEvent.title}</h2>
             <p>
               <strong>Leírás:</strong> {selectedEvent.description}
@@ -565,7 +521,7 @@ const EventsPage: React.FC = () => {
             <p>
               <strong>Szervező:</strong> {selectedEvent.organizer}
             </p>
-            <button className='bezar' onClick={() => setSelectedEvent(null)}>Bezár</button>
+            <button onClick={() => setSelectedEvent(null)}>Bezár</button>
           </div>
         </div>
       )}

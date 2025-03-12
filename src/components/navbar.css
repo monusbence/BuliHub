@@ -34,6 +34,10 @@
     gap: 1.5rem;
     list-style: none;
   }
+  .nav-links a.disabled {
+    pointer-events: none;
+    color: #888; /* vagy bármilyen szürke árnyalat */
+  }
   
   .nav-links li a {
     color: #fff;

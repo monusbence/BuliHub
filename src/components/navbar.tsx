@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Navbar.css";
 
 interface NavbarProps {
@@ -7,18 +7,24 @@ interface NavbarProps {
   onRegisterClick?: () => void;
 }
 
-/**
- * Általános felső navbar, hamburger menüvel mobil nézetben.
- */
 const Navbar: React.FC<NavbarProps> = ({
   user,
   onLogout = () => {},
   onRegisterClick = () => {},
 }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Ha a felhasználó be van jelentkezve, a regisztrációs link le van tiltva.
+  const handleRegisterClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault();
+    if (!user) {
+      onRegisterClick();
+      toggleMenu();
+    }
   };
 
   return (
@@ -29,47 +35,35 @@ const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Hamburger ikon */}
-      <div
-        className={`hamburger ${isMenuOpen ? "active" : ""}`}
-        onClick={toggleMenu}
-      >
+      <div className={`hamburger ${isMenuOpen ? "active" : ""}`} onClick={toggleMenu}>
         <span></span>
         <span></span>
         <span></span>
       </div>
 
-      {/* Linkek */}
+      {/* Menüpontok */}
       <ul className={`nav-links ${isMenuOpen ? "open" : ""}`}>
         <li>
-          <a href="/" onClick={toggleMenu}>
-            Főoldal
-          </a>
+          <a href="/" onClick={toggleMenu}>Főoldal</a>
         </li>
         <li>
-          <a href="/events" onClick={toggleMenu}>
-            Események
-          </a>
+          <a href="/events" onClick={toggleMenu}>Események</a>
         </li>
         <li>
-          <a href="/contact" onClick={toggleMenu}>
-            Kapcsolat
-          </a>
+          <a href="/contact" onClick={toggleMenu}>Kapcsolat</a>
         </li>
         <li>
           <a
             href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              onRegisterClick();
-              toggleMenu();
-            }}
+            onClick={handleRegisterClick}
+            className={user ? "disabled" : ""}
           >
             Regisztráció
           </a>
         </li>
       </ul>
 
-      {/* Bejelentkezett felhasználó (jobbra igazítva) */}
+      {/* Bejelentkezett felhasználó adatai */}
       {user && (
         <div className="user-info">
           <span>{user.fullName}</span>

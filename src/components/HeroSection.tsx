@@ -110,15 +110,18 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </>
           )}
-          <div style={{ marginBottom: '1rem' }}>
-            <a href="#" className="forgot-link">
-              Elfelejtetted a jelszavad?
-            </a>
-            <br />
-            <a href="#" onClick={onRegisterClick} style={{ color: '#0af' }}>
-              Regisztrálj új fiókot
-            </a>
-          </div>
+          {/* Csak akkor jelenjen meg, ha nincs bejelentkezve */}
+          {!user && (
+            <div style={{ marginBottom: '1rem' }}>
+              <a href="#" className="forgot-link">
+                Elfelejtetted a jelszavad?
+              </a>
+              <br />
+              <a href="#" onClick={onRegisterClick} style={{ color: '#0af' }}>
+                Regisztrálj új fiókot
+              </a>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -178,12 +181,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   </button>
                 </>
               )}
-              <a href="#" className="forgot-link">
-                Elfelejtetted a jelszavad?
-              </a>
-              <a href="#" className="register-link" onClick={onRegisterClick}>
-                Regisztrálj új fiókot
-              </a>
+              {/* Csak akkor jelenjenek meg, ha nincs bejelentkezve */}
+              {!user && (
+                <>
+                  <a href="#" className="forgot-link">
+                    Elfelejtetted a jelszavad?
+                  </a>
+                  <a href="#" className="register-link" onClick={onRegisterClick}>
+                    Regisztrálj új fiókot
+                  </a>
+                </>
+              )}
             </div>
             <div className="bottom-bar">
               <div className="home-indicator"></div>

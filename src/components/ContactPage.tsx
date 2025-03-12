@@ -3,11 +3,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Navbar from './navbar';
 import Footer from './footer';
-import RegisterModal from './RegisterModal'; // Győződj meg róla, hogy ez a helyes útvonal!
+import RegisterModal from './RegisterModal';
 import './ContactPage.css';
 
 const ContactPage = () => {
-  // State a regisztrációs modal láthatóságához
+  // Regisztrációs modal állapota
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   // Kapcsolati űrlap állapota
@@ -35,10 +35,13 @@ const ContactPage = () => {
     });
   };
 
+  // Bejelentkezett felhasználó kinyerése a localStorage-ből
+  const storedUser = localStorage.getItem('user');
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
   return (
     <div className="page-container">
-      {/* Navbar, amelynek átadjuk az onRegisterClick prop-ot */}
-      <Navbar onRegisterClick={() => setIsRegisterModalOpen(true)} />
+      <Navbar user={currentUser} onRegisterClick={() => setIsRegisterModalOpen(true)} />
 
       <main className="contact-main-content">
         <h1>Kapcsolat</h1>
@@ -97,7 +100,6 @@ const ContactPage = () => {
 
       <Footer />
 
-      {/* Regisztrációs modal feltételes renderelése */}
       {isRegisterModalOpen && (
         <RegisterModal onClose={() => setIsRegisterModalOpen(false)} />
       )}
