@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Footer from './footer';
 import Navbar from './navbar';
+import RegisterModal from './RegisterModal'; // Ellenőrizd a helyes útvonalat!
 import './EventsPage.css';
+import { color } from 'framer-motion';
 
-// Időpont formázása: 2025.12.09 19:30
+// Segédfüggvény az időpont formázásához (pl. 2025.12.09 19:30)
 function formatDateTime(dateString: string): string {
   if (!dateString) return '';
   const dateObj = new Date(dateString);
@@ -15,27 +17,27 @@ function formatDateTime(dateString: string): string {
   return `${year}.${month}.${day} ${hours}:${minutes}`;
 }
 
-// Esemény interface
 interface EventItem {
   id: number;
-  title: string;        // => name (backend)
+  title: string;        // frontend: a buli neve (a backend értéke a Name, de itt "title")
   description: string;
   startDate: string;
   endDate: string;
-  location: string;     // => locationName
-  address: string;      // => address
-  equipment: string;    // => equipment
-  organizer: string;    // => organizerName
-  category: string;     // => theme
+  location: string;     // backend: locationName
+  address: string;      // backend: address
+  equipment: string;    // backend: equipment
+  organizer: string;    // backend: organizerName
+  category: string;     // frontend: kategória, de a backend a "Theme"-et várja
   imageUrl: string;
+  guests: number;
 }
 
-function EventsPage() {
-  // Betöltés, események
+const EventsPage: React.FC = () => {
+  // Állapotok az események lekéréséhez és megjelenítéséhez
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
 
-  // Szűrés
+  // Szűréshez használt state-ek
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
@@ -47,11 +49,22 @@ function EventsPage() {
   const [past, setPast] = useState(false);
   const [minDuration, setMinDuration] = useState('');
   const [maxDuration, setMaxDuration] = useState('');
+  // Saját bulik szűrésére
+  const [myEvents, setMyEvents] = useState(false);
 
-  // Modal
+  // Részletező modal az eseményekhez
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  // Szerkesztési modal a saját buli módosításához
+  const [editEvent, setEditEvent] = useState<EventItem | null>(null);
 
-  // Lekérés a backendről
+  // Regisztrációs modal state
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  // A bejelentkezett felhasználó kinyerése a localStorage-ből
+  const storedUser = localStorage.getItem('user');
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+  // Események lekérése a backendről
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
@@ -60,15 +73,11 @@ function EventsPage() {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
-
         if (!response.ok) {
           throw new Error(`Hiba: ${response.status} ${response.statusText}`);
         }
-
         const data = await response.json();
         console.log('=== DEBUG: Raw events from server ===', data);
-
-        // Mappeljük a frontendi mezőkre
         const mapped: EventItem[] = data.map((ev: any) => ({
           id: ev.id,
           title: ev.name || 'Esemény címe',
@@ -80,9 +89,9 @@ function EventsPage() {
           equipment: ev.equipment || '',
           organizer: ev.organizerName || 'Ismeretlen szervező',
           category: ev.theme || 'Egyéb',
-          imageUrl: `https://picsum.photos/300/200?random=${ev.id}`
+          imageUrl: `https://picsum.photos/300/200?random=${ev.id}`,
+          guests: ev.guests || 0
         }));
-
         console.log('=== DEBUG: Mapped events ===', mapped);
         setEvents(mapped);
       } catch (error) {
@@ -91,16 +100,14 @@ function EventsPage() {
         setIsLoading(false);
       }
     };
-
     fetchEvents();
   }, []);
 
-  // Szűrt lista
+  // Szűrés
   const filteredEvents = events.filter((event) => {
     const matchKeyword =
       event.title.toLowerCase().includes(keyword.toLowerCase()) ||
       event.location.toLowerCase().includes(keyword.toLowerCase());
-
     const matchCategory = category ? event.category === category : true;
     const matchFromDate = fromDate ? new Date(event.startDate) >= new Date(fromDate) : true;
     const matchToDate = toDate ? new Date(event.startDate) <= new Date(toDate) : true;
@@ -110,18 +117,18 @@ function EventsPage() {
     const matchOrganizer = organizerFilter
       ? event.organizer.toLowerCase().includes(organizerFilter.toLowerCase())
       : true;
-
     const now = new Date();
     const eventStart = new Date(event.startDate);
     const eventEnd = new Date(event.endDate);
-
     const matchUpcoming = upcoming ? eventStart >= now : true;
     const matchPast = past ? eventEnd < now : true;
-
     const durationInDays =
       (eventEnd.getTime() - eventStart.getTime()) / (1000 * 3600 * 24) + 1;
     const matchMinDuration = minDuration ? durationInDays >= parseInt(minDuration) : true;
     const matchMaxDuration = maxDuration ? durationInDays <= parseInt(maxDuration) : true;
+    const matchMyEvents = myEvents
+      ? (currentUser ? event.organizer.toLowerCase() === currentUser.fullName.toLowerCase() : false)
+      : true;
 
     return (
       matchKeyword &&
@@ -133,11 +140,234 @@ function EventsPage() {
       matchUpcoming &&
       matchPast &&
       matchMinDuration &&
-      matchMaxDuration
+      matchMaxDuration &&
+      matchMyEvents
     );
   });
 
-  // Ha épp betölt (loader)
+  // Törlés (DELETE)
+  const handleDelete = async (eventId: number) => {
+    if (!window.confirm("Biztosan törlöd ezt az eseményt?")) return;
+    const token = localStorage.getItem('jwtToken');
+    try {
+      const response = await fetch(`https://localhost:7248/api/Events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      if (response.ok) {
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+      } else {
+        const errorText = await response.text();
+        alert("Hiba a törlés során: " + errorText);
+      }
+    } catch (error) {
+      console.error("Törlési hiba:", error);
+    }
+  };
+
+  // Módosítás (PUT)
+  const handleUpdate = async (updated: EventItem) => {
+    const token = localStorage.getItem('jwtToken');
+    try {
+      const response = await fetch(`https://localhost:7248/api/Events/${updated.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          Id: updated.id,
+          PartyName: updated.title,
+          Description: updated.description,
+          StartDate: updated.startDate,
+          EndDate: updated.endDate,
+          LocationName: updated.location,
+          Address: updated.address,
+          Equipment: updated.equipment,
+          Guests: updated.guests,
+          Theme: updated.category,
+          OrganizerName: updated.organizer,
+          ProviderId: 0,
+          Status: "Upcoming"
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(prev => prev.map(e => e.id === data.id ? {
+          id: data.id,
+          title: data.name,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          location: data.locationName,
+          address: data.address,
+          equipment: data.equipment,
+          organizer: data.organizerName,
+          category: data.theme,
+          imageUrl: e.imageUrl,
+          guests: data.guests
+        } : e));
+        setEditEvent(null);
+      } else {
+        const errorText = await response.text();
+        alert("Hiba a módosítás során: " + errorText);
+      }
+    } catch (error) {
+      console.error("Frissítési hiba:", error);
+    }
+  };
+
+  // Szerkesztési modal komponens
+  const EditEventModal: React.FC<{ event: EventItem; onClose: () => void }> = ({
+    event,
+    onClose,
+  }) => {
+    const [editData, setEditData] = useState<EventItem>(event);
+
+    const handleChange = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+      const { name, value } = e.target;
+      setEditData((prev) => ({
+        ...prev,
+        [name]: name === 'guests' ? Number(value) : value,
+      }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      handleUpdate(editData);
+    };
+
+    return (
+      <div className="modal">
+        <div className="modal-content">
+          <h2>Esemény módosítása</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Buli neve:</label>
+              <input
+                type="text"
+                name="title"
+                value={editData.title}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Leírás:</label>
+              <textarea
+                name="description"
+                value={editData.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Kezdés:</label>
+              <input
+                type="datetime-local"
+                name="startDate"
+                value={new Date(editData.startDate).toISOString().slice(0, 16)}
+                onChange={(e) => {
+                  const newStart = new Date(e.target.value);
+                  setEditData((prev) => ({
+                    ...prev,
+                    startDate: newStart.toISOString(),
+                  }));
+                }}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Befejezés:</label>
+              <input
+                type="datetime-local"
+                name="endDate"
+                value={new Date(editData.endDate).toISOString().slice(0, 16)}
+                onChange={(e) => {
+                  const newEnd = new Date(e.target.value);
+                  setEditData((prev) => ({
+                    ...prev,
+                    endDate: newEnd.toISOString(),
+                  }));
+                }}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Helyszín:</label>
+              <input
+                type="text"
+                name="location"
+                value={editData.location}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Cím:</label>
+              <input
+                type="text"
+                name="address"
+                value={editData.address}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Extrák:</label>
+              <input
+                type="text"
+                name="equipment"
+                value={editData.equipment}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <label>Vendégek száma:</label>
+              <input
+                type="number"
+                name="guests"
+                value={editData.guests}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Téma:</label>
+              <input
+                type="text"
+                name="category"
+                value={editData.category}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+              <button
+              className='save'
+                type="submit"
+              >
+                Mentés
+              </button>
+              <button
+              className='cancel'
+                type="button"
+                onClick={onClose}
+              >
+                Mégse
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="preloader">
@@ -146,13 +376,10 @@ function EventsPage() {
     );
   }
 
-  // Render
   return (
     <div className="page-container">
-      {/* FELSŐ NAVBAR (hamburger) */}
-      <Navbar />
+      <Navbar onRegisterClick={() => setIsRegisterModalOpen(true)} />
 
-      {/* Eseménylista tartalom */}
       <main className="events-main-content">
         <h1>Események</h1>
         <p>Válogass a legfrissebb események közül, vagy szűrj rá!</p>
@@ -225,6 +452,14 @@ function EventsPage() {
                 />
                 Lejárt
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={myEvents}
+                  onChange={(e) => setMyEvents(e.target.checked)}
+                />
+                Saját bulik
+              </label>
               <input
                 type="number"
                 placeholder="Min. napok száma"
@@ -259,8 +494,8 @@ function EventsPage() {
                   </p>
                   <p>
                     <strong>Helyszín:</strong> {event.location}
+                    {event.address && `, ${event.address}`}
                   </p>
-                  {event.address && <p>Cím: {event.address}</p>}
                   {event.equipment && <p>Extrák: {event.equipment}</p>}
                   <p>
                     <strong>Kategória:</strong> {event.category}
@@ -268,12 +503,31 @@ function EventsPage() {
                   <p>
                     <strong>Szervező:</strong> {event.organizer}
                   </p>
-                  <button
-                    className="btn-details"
-                    onClick={() => setSelectedEvent(event)}
-                  >
-                    Részletek
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <button
+                      className="btn-details details-button"
+                      onClick={() => setSelectedEvent(event)}
+                    >
+                      Részletek
+                    </button>
+
+                    {currentUser && currentUser.fullName.toLowerCase() === event.organizer.toLowerCase() && (
+                      <>
+                        <button
+                          className="btn-details edit-button"
+                          onClick={() => setEditEvent(event)}
+                        >
+                          Módosítás
+                        </button>
+                        <button
+                          className="btn-details delete-button"
+                          onClick={() => handleDelete(event.id)}
+                        >
+                          Törlés
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -302,20 +556,33 @@ function EventsPage() {
             </p>
             <p>
               <strong>Helyszín:</strong> {selectedEvent.location}
+              {selectedEvent.address && `, ${selectedEvent.address}`}
             </p>
-            {selectedEvent.address && <p>Cím: {selectedEvent.address}</p>}
             {selectedEvent.equipment && <p>Extrák: {selectedEvent.equipment}</p>}
+            <p>
+              <strong>Kategória:</strong> {selectedEvent.category}
+            </p>
             <p>
               <strong>Szervező:</strong> {selectedEvent.organizer}
             </p>
-            <button onClick={() => setSelectedEvent(null)}>Bezár</button>
+            <button className='bezar' onClick={() => setSelectedEvent(null)}>Bezár</button>
           </div>
         </div>
       )}
 
+      {/* Módosítás Modal */}
+      {editEvent && (
+        <EditEventModal event={editEvent} onClose={() => setEditEvent(null)} />
+      )}
+
       <Footer />
+
+      {/* Regisztrációs modal */}
+      {isRegisterModalOpen && (
+        <RegisterModal onClose={() => setIsRegisterModalOpen(false)} />
+      )}
     </div>
   );
-}
+};
 
 export default EventsPage;

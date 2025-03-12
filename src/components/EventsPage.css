@@ -184,27 +184,180 @@
   font-size: 1.2rem;
 }
 
-.btn-details {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
+/* Preloader */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.loading-bar {
+  width: 220px;
+  height: 4px;
+  background-color: #007BFF;
+  transform-origin: left;
+  border-radius: 2px;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: scaleX(0);
+  }
+
+  50% {
+    transform: scaleX(1);
+  }
+
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+/* Modal stílusok */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.modal-content {
+  background: #fff;
+  color: #000;
+  /* kevesebb padding, kisebb max-width */
+  padding: 1rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 420px;
+  /* korlátozzuk a magasságot, és görgethetővé tesszük */
+  max-height: 70vh;
+  overflow-y: auto;
+
+  /* animáció */
+  animation: fadeInUp 0.4s ease forwards;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  font-family: Arial, sans-serif;
+}
+
+.modal .modal-content h2 {
+  color: #c841c6;
+}
+
+/* Egységes fadeInUp animáció a modális felugráshoz */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gombok a modálisban */
+.modal-content .bezar {
   background-color: #c841c6;
   color: #fff;
+}
+
+.modal-content .bezar:hover {
+  background-color: #852883;
+  color: black;
+}
+
+.modal-content button {
+  margin-top: 1rem;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/*.modal-content button:hover {
+  background-color: #a735a2;
+}*/
+
+/* form-group a modális űrlaphoz */
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  /* Minimális stílus, lehet tovább csinosítani */
+}
+
+/* ────────────────────────────────────────────────────── */
+/* Egységes gombstílus a kártyákon (Részletek, Módosítás, Törlés) */
+/* ────────────────────────────────────────────────────── */
+.btn-details {
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.3s ease;
 }
 
-.btn-details:hover {
-  background-color: #a735a2;
+/* Részletek gomb (lila) */
+.details-button {
+  background-color: #c841c6;
+  color: #fff;
 }
 
-/* Footer */
-footer {
-  width: 100%;
-  margin: 0;
-  padding: 1rem;
-  background-color: #111;
+.details-button:hover {
+  background-color: #b735b4;
+}
+
+/* Módosítás gomb (sárga) */
+.edit-button {
+  background-color: yellow;
+  color: #000;
+}
+
+.edit-button:hover {
+  background-color: gold;
+  /* sötétebb sárga */
+}
+
+/* Törlés gomb (piros) */
+.delete-button {
+  background-color: red;
+  color: #fff;
+}
+
+.delete-button:hover {
+  background-color: #cc0000;
+  /* sötétebb piros */
 }
 
 /* Mobilnézet */
@@ -297,74 +450,28 @@ footer {
   }
 }
 
-/* Preloader */
-.preloader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.loading-bar {
-  width: 220px;
-  height: 4px;
-  background-color: #007BFF;
-  transform-origin: left;
-  border-radius: 2px;
-  animation: loading 1.5s ease-in-out infinite;
-}
-
-@keyframes loading {
-  0% {
-    transform: scaleX(0);
-  }
-  50% {
-    transform: scaleX(1);
-  }
-  100% {
-    transform: scaleX(0);
-  }
-}
-
-/* Modal stílusok */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3000;
-}
-
-.modal-content {
-  background: #fff;
-  color: #000;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
-}
-
-.modal-content button {
-  margin-top: 1rem;
-  background-color: #c841c6;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+.cancel {
   padding: 0.5rem 1rem;
   cursor: pointer;
+  background-Color: #39393b;
+  border: none;
+  color: white;
 }
 
-.modal-content button:hover {
-  background-color: #a735a2;
+.cancel:hover {
+  background-color: #55555c;
+  color: black;
+}
+
+.save {
+  background-Color: #c841c6;
+  padding: 0.5rem 1rem;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.save:hover {
+  background-color: #852883;
+  color: black;
 }

@@ -4,6 +4,7 @@ using Bulihub_Backend.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bulihub_Backend.Controllers
 {
@@ -37,20 +38,23 @@ namespace Bulihub_Backend.Controllers
                 .Include(e => e.Provider)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-            if (ev == null) return NotFound();
+            if (ev == null)
+                return NotFound();
+
             return Ok(ev);
         }
 
         // POST: api/events
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto dto)
         {
-            // Kinyerjük a bejelentkezett user nevét (ClaimTypes.Name)
+            // Kinyerjük a bejelentkezett user nevét a tokenből
             var userFullName = User?.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.Name)
                 ?.Value ?? "Ismeretlen szervező";
 
-            // Dátum+idő formázás
+            // Dátum+idő feldolgozása a dto.Time alapján
             DateTime startDate;
             try
             {
@@ -69,13 +73,13 @@ namespace Bulihub_Backend.Controllers
                 Name = dto.PartyName,
                 Description = dto.Description,
                 StartDate = startDate,
-                EndDate = startDate.AddHours(4), // default 4 óra
+                EndDate = startDate.AddHours(4), // Default időtartam: 4 óra
                 LocationName = dto.LocationName,
                 Address = dto.Address,
                 Equipment = dto.Equipment,
                 Guests = dto.Guests,
                 Theme = dto.Theme,
-                OrganizerName = userFullName,
+                OrganizerName = userFullName,  // A JWT tokenből kinyert felhasználónév
                 Status = "Upcoming"
             };
 
@@ -86,37 +90,54 @@ namespace Bulihub_Backend.Controllers
         }
 
         // PUT: api/events/5
+        [Authorize]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] Event updatedEvent)
+        public async Task<IActionResult> UpdateEvent(int id, [FromBody] UpdateEventDto dto)
         {
-            if (id != updatedEvent.Id) return BadRequest("ID mismatch");
+            if (id != dto.Id)
+                return BadRequest("ID mismatch");
 
-            var existing = await _context.Events.FindAsync(id);
-            if (existing == null) return NotFound();
+            var existingEvent = await _context.Events.FindAsync(id);
+            if (existingEvent == null)
+                return NotFound();
 
-            existing.Name = updatedEvent.Name;
-            existing.Description = updatedEvent.Description;
-            existing.StartDate = updatedEvent.StartDate;
-            existing.EndDate = updatedEvent.EndDate;
-            existing.LocationName = updatedEvent.LocationName;
-            existing.Address = updatedEvent.Address;
-            existing.Equipment = updatedEvent.Equipment;
-            existing.Guests = updatedEvent.Guests;
-            existing.Theme = updatedEvent.Theme;
-            existing.OrganizerName = updatedEvent.OrganizerName; // Ha frissíteni akarod
-            existing.ProviderId = updatedEvent.ProviderId;
-            existing.Status = updatedEvent.Status;
+            // Ellenőrizzük, hogy a bejelentkezett felhasználó a buli szervezője-e
+            var currentUser = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (!string.Equals(existingEvent.OrganizerName, currentUser, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid("You are not allowed to update this event.");
+            }
+
+            // Frissítjük az esemény adatait az UpdateEventDto alapján
+            existingEvent.Name = dto.PartyName;
+            existingEvent.Description = dto.Description;
+            existingEvent.StartDate = dto.StartDate;
+            existingEvent.EndDate = dto.EndDate;
+            existingEvent.LocationName = dto.LocationName;
+            existingEvent.Address = dto.Address;
+            existingEvent.Equipment = dto.Equipment;
+            existingEvent.Guests = dto.Guests;
+            existingEvent.Theme = dto.Theme;
+            // OrganizerName, ProviderId és Status általában nem változik itt
 
             await _context.SaveChangesAsync();
-            return Ok(existing);
+            return Ok(existingEvent);
         }
 
         // DELETE: api/events/5
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             var existing = await _context.Events.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null)
+                return NotFound();
+
+            var currentUser = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (!string.Equals(existing.OrganizerName, currentUser, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid("You are not allowed to delete this event.");
+            }
 
             _context.Events.Remove(existing);
             await _context.SaveChangesAsync();
@@ -124,5 +145,19 @@ namespace Bulihub_Backend.Controllers
             return NoContent();
         }
     }
-}
 
+    // Új DTO az esemény frissítéséhez
+    public class UpdateEventDto
+    {
+        public int Id { get; set; }
+        public string PartyName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string LocationName { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string Equipment { get; set; } = string.Empty;
+        public int Guests { get; set; }
+        public string Theme { get; set; } = string.Empty;
+    }
+}

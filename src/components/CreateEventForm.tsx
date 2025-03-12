@@ -9,7 +9,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
     partyName: '',
     date: '',
     time: '',
-    location: '',
+    locationName: '',  // Átnevezve location helyett
     address: '',
     equipment: '',
     guests: '',
@@ -27,21 +27,23 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Ha nincs bejelentkezve a user, letiltjuk a létrehozást.
     if (!user) {
       alert('Jelentkezz be, hogy létrehozhass egy bulit!');
       return;
     }
 
-    // JWT token kikérése a localStorage-ból:
-    const token = localStorage.getItem('jwtToken');
+    // Ellenőrizzük, hogy a date és time mezők ki vannak töltve
+    if (!formData.date || !formData.time) {
+      alert('Kérlek, add meg a dátumot és az időpontot!');
+      return;
+    }
 
-    // Összeállítjuk a buli adatait:
+    // Összeállítjuk az esemény adatait a backend által elvárt mezőnevekkel.
     const eventData = {
       partyName: formData.partyName,
-      date: formData.date,
-      time: formData.time,
-      location: formData.location,
+      date: formData.date,           // A backend a Date típusú property-ként várja (pl. "2025-06-09")
+      time: formData.time,           // Az időpont string, pl. "18:30"
+      locationName: formData.locationName, // Most már megfelelően
       address: formData.address,
       equipment: formData.equipment,
       guests: parseInt(formData.guests, 10),
@@ -49,12 +51,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       description: formData.description,
     };
 
+    // JWT token kikérése a localStorage-ból:
+    const token = localStorage.getItem('jwtToken');
+
     try {
       const response = await fetch('https://localhost:7248/api/Events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // A Bearer token használata
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(eventData),
@@ -71,12 +75,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       alert('Hiba történt az esemény létrehozása során');
     }
 
-    // Mezők törlése a formban
+    // Mezők törlése
     setFormData({
       partyName: '',
       date: '',
       time: '',
-      location: '',
+      locationName: '',
       address: '',
       equipment: '',
       guests: '',
@@ -131,13 +135,13 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="location">Helyszín</label>
+              <label htmlFor="locationName">Helyszín</label>
               <input
                 type="text"
-                id="location"
-                name="location"
+                id="locationName"
+                name="locationName"
                 placeholder="Add meg a helyszínt"
-                value={formData.location}
+                value={formData.locationName}
                 onChange={handleInputChange}
                 required
               />

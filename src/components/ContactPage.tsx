@@ -3,12 +3,13 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Navbar from './navbar';
 import Footer from './footer';
+import RegisterModal from './RegisterModal'; // Győződj meg róla, hogy ez a helyes útvonal!
 import './ContactPage.css';
 
-// Budapest középpont koordinátái
-const center: [number, number] = [47.5333, 21.6333]; // Debrecen, Cívis utca 3.
-
 const ContactPage = () => {
+  // State a regisztrációs modal láthatóságához
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
   // Kapcsolati űrlap állapota
   const [formData, setFormData] = useState({
     name: '',
@@ -16,9 +17,7 @@ const ContactPage = () => {
     message: '',
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -28,7 +27,7 @@ const ContactPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Űrlapadatok:', formData);
-    // Itt lehet például API-hívást végezni
+    // Itt végezhetsz API-hívást
     setFormData({
       name: '',
       email: '',
@@ -38,8 +37,8 @@ const ContactPage = () => {
 
   return (
     <div className="page-container">
-      {/* Felső Navbar hamburger menüvel */}
-      <Navbar />
+      {/* Navbar, amelynek átadjuk az onRegisterClick prop-ot */}
+      <Navbar onRegisterClick={() => setIsRegisterModalOpen(true)} />
 
       <main className="contact-main-content">
         <h1>Kapcsolat</h1>
@@ -82,14 +81,14 @@ const ContactPage = () => {
           </div>
         </div>
 
-        {/* OpenStreetMap térkép Leaflet.js segítségével */}
+        {/* OpenStreetMap térkép */}
         <div className="map-container">
-          <MapContainer center={center} zoom={13} style={{ height: "300px", width: "100%" }}>
+          <MapContainer center={[47.5333, 21.6333]} zoom={13} style={{ height: "300px", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            <Marker position={center}>
+            <Marker position={[47.5333, 21.6333]}>
               <Popup>Cívis utca 3</Popup>
             </Marker>
           </MapContainer>
@@ -97,6 +96,11 @@ const ContactPage = () => {
       </main>
 
       <Footer />
+
+      {/* Regisztrációs modal feltételes renderelése */}
+      {isRegisterModalOpen && (
+        <RegisterModal onClose={() => setIsRegisterModalOpen(false)} />
+      )}
     </div>
   );
 };

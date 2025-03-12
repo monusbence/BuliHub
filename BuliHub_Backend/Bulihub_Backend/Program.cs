@@ -2,8 +2,9 @@ using Bulihub_Backend.Data;
 using Bulihub_Backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<BuliHubDbContext>(options =>
         ServerVersion.AutoDetect(connectionString));
 });
 
+// 3) CORS beállítások
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -29,8 +31,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-// 3) ASP.NET Core Identity
+// 4) ASP.NET Core Identity konfiguráció
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     // Példa Identity beállítások:
@@ -42,7 +43,38 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 .AddEntityFrameworkStores<BuliHubDbContext>()
 .AddDefaultTokenProviders();
 
-// 4) Kontroller
+// 5) JWT Bearer autentikáció hozzáadása
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "bulihub.hu",
+        ValidAudience = "bulihub.hu",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey@345SuperSecretKey@345"))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            // Megakadályozzuk az alapértelmezett redirect-et
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync("{\"error\": \"Unauthorized\"}");
+        }
+    };
+});
+
+// 6) Kontroller
 builder.Services.AddControllers();
 
 // (Opcionális) Swagger
