@@ -16,6 +16,11 @@ namespace Bulihub_Backend.Data
         }
 
         // Saját entitások
+
+        public DbSet<Admin> Admins { get; set; } = null!;
+
+       
+
         public DbSet<Models.User> Users { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
@@ -26,7 +31,7 @@ namespace Bulihub_Backend.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<Admin>().ToTable("Admins");
             builder.Entity<ApplicationUser>().ToTable("Users");
             builder.Entity<Models.ApplicationRole>().ToTable("Roles");
             builder.Entity<Microsoft.AspNetCore.Identity.IdentityUserRole<int>>().ToTable("UserRoles");

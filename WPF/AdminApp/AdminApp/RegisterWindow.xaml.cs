@@ -8,7 +8,7 @@ namespace AdminApp
 {
     public partial class RegisterWindow : Window
     {
-        private static readonly HttpClient client = new HttpClient { BaseAddress = new System.Uri("https://localhost:5001/") }; // Állítsd be a megfelelő API URL-t és portot
+        private static readonly HttpClient client = new HttpClient { BaseAddress = new System.Uri("https://localhost:7248/") }; // Állítsd be a megfelelő API URL-t és portot
 
         public RegisterWindow()
         {
