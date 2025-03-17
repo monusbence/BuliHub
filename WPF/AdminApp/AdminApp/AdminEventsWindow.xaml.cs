@@ -1,18 +1,19 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Windows;
 using System.Linq;
+using System.ComponentModel;
 
 namespace AdminApp
 {
-    public partial class AdminEventsWindow : Window
+    public partial class AdminEventsEditWindow : Window
     {
-        // Az admin végpontokat használjuk
-        private static readonly HttpClient client = new HttpClient { BaseAddress = new System.Uri("https://localhost:7248/") };
-        public ObservableCollection<EventItemViewModel> Events { get; set; } = new ObservableCollection<EventItemViewModel>();
+        private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("https://localhost:7248/") };
+        public ObservableCollection<EventEditViewModel> Events { get; set; } = new ObservableCollection<EventEditViewModel>();
 
-        public AdminEventsWindow()
+        public AdminEventsEditWindow()
         {
             InitializeComponent();
             LoadEvents();
@@ -22,14 +23,104 @@ namespace AdminApp
         public class EventDto
         {
             public int Id { get; set; }
-            public string Name { get; set; } = "";
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public string Status { get; set; } = "";
+            public int? Guests { get; set; }
+            public string? LocationName { get; set; }
+            public string? Theme { get; set; }
+            public string? Address { get; set; }
+            public string? Equipment { get; set; }
         }
 
-        public class EventItemViewModel
+        public class EventEditViewModel : INotifyPropertyChanged
         {
             public int Id { get; set; }
-            public string Name { get; set; } = "";
-            public bool IsMarkedForDeletion { get; set; }
+            private DateTime startDate;
+            public DateTime StartDate
+            {
+                get => startDate;
+                set { startDate = value; OnPropertyChanged(nameof(StartDate)); }
+            }
+            private DateTime endDate;
+            public DateTime EndDate
+            {
+                get => endDate;
+                set { endDate = value; OnPropertyChanged(nameof(EndDate)); }
+            }
+            private string status = "";
+            public string Status
+            {
+                get => status;
+                set { status = value; OnPropertyChanged(nameof(Status)); }
+            }
+            private int? guests;
+            public int? Guests
+            {
+                get => guests;
+                set { guests = value; OnPropertyChanged(nameof(Guests)); OnPropertyChanged(nameof(GuestsString)); }
+            }
+            public string GuestsString
+            {
+                get => Guests?.ToString() ?? "";
+                set
+                {
+                    if (int.TryParse(value, out int result))
+                        Guests = result;
+                    else
+                        Guests = null;
+                    OnPropertyChanged(nameof(GuestsString));
+                }
+            }
+            private string locationName = "";
+            public string LocationName
+            {
+                get => locationName;
+                set { locationName = value; OnPropertyChanged(nameof(LocationName)); }
+            }
+            private string theme = "";
+            public string Theme
+            {
+                get => theme;
+                set { theme = value; OnPropertyChanged(nameof(Theme)); }
+            }
+            private string address = "";
+            public string Address
+            {
+                get => address;
+                set { address = value; OnPropertyChanged(nameof(Address)); }
+            }
+            private string equipment = "";
+            public string Equipment
+            {
+                get => equipment;
+                set { equipment = value; OnPropertyChanged(nameof(Equipment)); }
+            }
+            private bool isMarkedForDeletion;
+            public bool IsMarkedForDeletion
+            {
+                get => isMarkedForDeletion;
+                set { isMarkedForDeletion = value; OnPropertyChanged(nameof(IsMarkedForDeletion)); }
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected void OnPropertyChanged(string propertyName)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        // DTO a PATCH kéréshez, minden mező opcionális
+        public class PatchEventDto
+        {
+            public DateTime? StartDate { get; set; }
+            public DateTime? EndDate { get; set; }
+            public string? Status { get; set; }
+            public int? Guests { get; set; }
+            public string? LocationName { get; set; }
+            public string? Theme { get; set; }
+            public string? Address { get; set; }
+            public string? Equipment { get; set; }
         }
 
         private async void LoadEvents()
@@ -42,18 +133,57 @@ namespace AdminApp
                     Events.Clear();
                     foreach (var ev in events)
                     {
-                        Events.Add(new EventItemViewModel
+                        Events.Add(new EventEditViewModel
                         {
                             Id = ev.Id,
-                            Name = ev.Name,
+                            StartDate = ev.StartDate,
+                            EndDate = ev.EndDate,
+                            Status = ev.Status,
+                            Guests = ev.Guests,
+                            LocationName = ev.LocationName ?? "",
+                            Theme = ev.Theme ?? "",
+                            Address = ev.Address ?? "",
+                            Equipment = ev.Equipment ?? ""
                         });
                     }
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Hiba az eventek betöltésekor: " + ex.Message);
             }
+        }
+
+        private async void UpdateEvents_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var ev in Events)
+            {
+                var dto = new PatchEventDto
+                {
+                    StartDate = ev.StartDate,
+                    EndDate = ev.EndDate,
+                    Status = string.IsNullOrWhiteSpace(ev.Status) ? null : ev.Status,
+                    Guests = ev.Guests,
+                    LocationName = string.IsNullOrWhiteSpace(ev.LocationName) ? null : ev.LocationName,
+                    Theme = string.IsNullOrWhiteSpace(ev.Theme) ? null : ev.Theme,
+                    Address = string.IsNullOrWhiteSpace(ev.Address) ? null : ev.Address,
+                    Equipment = string.IsNullOrWhiteSpace(ev.Equipment) ? null : ev.Equipment
+                };
+
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/admin/events/{ev.Id}")
+                {
+                    Content = JsonContent.Create(dto)
+                };
+
+                var response = await client.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Hiba az event (ID: {ev.Id}) frissítésekor: {error}");
+                }
+            }
+            MessageBox.Show("Eventek frissítve!");
+            LoadEvents();
         }
 
         private async void DeleteEvents_Click(object sender, RoutedEventArgs e)
@@ -61,7 +191,6 @@ namespace AdminApp
             var toDelete = Events.Where(ev => ev.IsMarkedForDeletion).ToList();
             foreach (var ev in toDelete)
             {
-                // Az új admin végpontot hívjuk:
                 var response = await client.DeleteAsync($"api/admin/events/{ev.Id}");
                 if (response.IsSuccessStatusCode)
                 {

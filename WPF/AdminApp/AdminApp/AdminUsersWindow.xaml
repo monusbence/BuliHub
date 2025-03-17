@@ -18,7 +18,7 @@
                             <!-- Szerkeszthető BirthDate (yyyy-MM-dd) -->
                             <TextBox Text="{Binding BirthDateString, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
                             <!-- Szerkeszthető Gender CheckBox -->
-                            <CheckBox IsChecked="{Binding Gender, UpdateSourceTrigger=PropertyChanged}" Content="Férfi?" Width="70" Margin="5" VerticalAlignment="Center"/>
+                            <CheckBox IsChecked="{Binding Gender, UpdateSourceTrigger=PropertyChanged}" Foreground="White" Content="Férfi?" Width="70" Margin="5" VerticalAlignment="Center"/>
                             <!-- Szerkeszthető City -->
                             <TextBox Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
                             <!-- Szerkeszthető Status -->

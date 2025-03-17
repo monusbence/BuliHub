@@ -165,7 +165,7 @@ namespace AdminApp
 
         private void OpenEventsWindow_Click(object sender, RoutedEventArgs e)
         {
-            AdminEventsWindow eventsWindow = new AdminEventsWindow();
+            AdminEventsEditWindow eventsWindow = new AdminEventsEditWindow();
             eventsWindow.Show();
             this.Close();
         }

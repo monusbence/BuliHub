@@ -27,32 +27,57 @@ namespace Bulihub_Backend.Controllers
             return NoContent();
         }
 
-        // PUT: api/admin/events/5
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] AdminUpdateEventDto dto)
+        
+
+        // PATCH: api/admin/events/5
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> PatchEvent(int id, [FromBody] PatchEventDto dto)
         {
-            if (id != dto.Id)
-                return BadRequest("ID mismatch");
-            var existingEvent = await _context.Events.FindAsync(id);
-            if (existingEvent == null)
+            var eventEntity = await _context.Events.FindAsync(id);
+            if (eventEntity == null)
                 return NotFound();
 
-            existingEvent.Name = dto.PartyName;
-            existingEvent.Description = dto.Description;
-            existingEvent.StartDate = dto.StartDate;
-            existingEvent.EndDate = dto.EndDate;
-            existingEvent.LocationName = dto.LocationName;
-            existingEvent.Address = dto.Address;
-            existingEvent.Equipment = dto.Equipment;
-            existingEvent.Guests = dto.Guests;
-            existingEvent.Theme = dto.Theme;
+            // Csak azok a mezők frissülnek, amiket nem null értékkel adunk meg
+            if (dto.StartDate.HasValue)
+                eventEntity.StartDate = dto.StartDate.Value;
+            if (dto.EndDate.HasValue)
+                eventEntity.EndDate = dto.EndDate.Value;
+            if (!string.IsNullOrEmpty(dto.Status))
+                eventEntity.Status = dto.Status;
+            if (dto.Guests.HasValue)
+                eventEntity.Guests = dto.Guests.Value;
+            if (!string.IsNullOrEmpty(dto.LocationName))
+                eventEntity.LocationName = dto.LocationName;
+            if (!string.IsNullOrEmpty(dto.Theme))
+                eventEntity.Theme = dto.Theme;
+            if (!string.IsNullOrEmpty(dto.Address))
+                eventEntity.Address = dto.Address;
+            if (!string.IsNullOrEmpty(dto.Equipment))
+                eventEntity.Equipment = dto.Equipment;
 
             await _context.SaveChangesAsync();
-            return Ok(existingEvent);
+            return Ok(eventEntity);
         }
 
-        // Nested DTO a duplikáció elkerülése érdekében
-        public class AdminUpdateEventDto
+        // Egyéb metódusok: GET, PUT, DELETE stb.
+    }
+
+    // DTO a PATCH metódushoz
+    public class PatchEventDto
+    {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Status { get; set; }
+        public int? Guests { get; set; }
+        public string? LocationName { get; set; }
+        public string? Theme { get; set; }
+        public string? Address { get; set; }
+        public string? Equipment { get; set; }
+    }
+
+
+    // Nested DTO a duplikáció elkerülése érdekében
+    public class AdminUpdateEventDto
         {
             public int Id { get; set; }
             public string PartyName { get; set; } = string.Empty;
@@ -66,5 +91,5 @@ namespace Bulihub_Backend.Controllers
             public string Theme { get; set; } = string.Empty;
         }
     }
-}
+
 

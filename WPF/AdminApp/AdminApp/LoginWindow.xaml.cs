@@ -43,7 +43,7 @@ namespace AdminApp
                     new AuthenticationHeaderValue("Bearer", AuthManager.Token);
 
                 // Sikeres bejelentkezés után automatikusan megnyitjuk az AdminEventsWindow-t
-                AdminEventsWindow eventsWindow = new AdminEventsWindow();
+                AdminEventsEditWindow eventsWindow = new AdminEventsEditWindow();
                 eventsWindow.Show();
                 this.Close();
             }
