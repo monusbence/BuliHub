@@ -4,6 +4,7 @@ using Bulihub_Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bulihub_Backend.Migrations
 {
     [DbContext(typeof(BuliHubDbContext))]
-    partial class BuliHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250317114119_PswdHash")]
+    partial class PswdHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,7 +215,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Bulihub_Backend.Models.Report", b =>
@@ -245,7 +248,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasIndex("ReportedBy");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("Bulihub_Backend.Models.Role", b =>
@@ -262,7 +265,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MyCustomRoles", (string)null);
+                    b.ToTable("MyCustomRoles");
                 });
 
             modelBuilder.Entity("Bulihub_Backend.Models.ServiceProvider", b =>
@@ -291,7 +294,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ServiceProviders", (string)null);
+                    b.ToTable("ServiceProviders");
                 });
 
             modelBuilder.Entity("Bulihub_Backend.Models.Ticket", b =>
@@ -324,7 +327,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Bulihub_Backend.Models.User", b =>
@@ -367,7 +370,7 @@ namespace Bulihub_Backend.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UsersSajat", (string)null);
+                    b.ToTable("UsersSajat");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

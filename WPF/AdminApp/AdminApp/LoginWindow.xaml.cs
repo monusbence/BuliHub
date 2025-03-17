@@ -37,11 +37,7 @@ namespace AdminApp
             var response = await client.PostAsJsonAsync("api/admins/login", dto);
             if (response.IsSuccessStatusCode)
             {
-                var loginResult = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-                AuthManager.Token = loginResult?.Token ?? "";
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", AuthManager.Token);
-
+                MessageBox.Show("Bejelentkezés sikeres!");
                 // Sikeres bejelentkezés után automatikusan megnyitjuk az AdminEventsWindow-t
                 AdminEventsEditWindow eventsWindow = new AdminEventsEditWindow();
                 eventsWindow.Show();
@@ -52,6 +48,7 @@ namespace AdminApp
                 MessageBox.Show("Hiba: " + await response.Content.ReadAsStringAsync());
             }
         }
+
     }
 }
 
