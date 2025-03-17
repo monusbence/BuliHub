@@ -1,15 +1,20 @@
 ﻿using Bulihub_Backend.Data;
 using Bulihub_Backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Bulihub_Backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/admins")]
     public class AdminsController : ControllerBase
     {
         private readonly BuliHubDbContext _context;
+        // A PasswordHasher az Admin típusra
+        private readonly PasswordHasher<Admin> _passwordHasher = new PasswordHasher<Admin>();
+
         public AdminsController(BuliHubDbContext context)
         {
             _context = context;
@@ -19,20 +24,22 @@ namespace Bulihub_Backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AdminRegisterDto dto)
         {
+            // Ellenőrizzük, hogy már létezik-e ilyen felhasználónév
             if (await _context.Admins.AnyAsync(a => a.Username == dto.Username))
             {
                 return Conflict("Ezzel a felhasználónévvel már regisztráltak.");
             }
 
-            var newAdmin = new Admin
+            var admin = new Admin
             {
                 Username = dto.Username,
-                Password = dto.Password // Egyszerűsített megoldás – éles környezetben jelszó hash-elést alkalmazz!
+                // A jelszó hash-elése – a null első paraméter helyett akár az admin objektumot is megadhatjuk
+                PasswordHash = _passwordHasher.HashPassword(null, dto.Password)
             };
 
-            _context.Admins.Add(newAdmin);
+            _context.Admins.Add(admin);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = newAdmin.Id }, newAdmin);
+            return Ok(new { Message = "Regisztráció sikeres", AdminId = admin.Id });
         }
 
         // POST: api/admins/login
@@ -40,21 +47,19 @@ namespace Bulihub_Backend.Controllers
         public async Task<IActionResult> Login([FromBody] AdminLoginDto dto)
         {
             var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Username == dto.Username);
-            if (admin == null || admin.Password != dto.Password)
+            if (admin == null)
             {
                 return Unauthorized("Érvénytelen felhasználónév vagy jelszó.");
             }
-            return Ok(new { message = "Sikeres bejelentkezés", adminId = admin.Id });
-        }
 
-        // GET: api/admins/{id}
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var admin = await _context.Admins.FindAsync(id);
-            if (admin == null)
-                return NotFound();
-            return Ok(admin);
+            var verificationResult = _passwordHasher.VerifyHashedPassword(admin, admin.PasswordHash, dto.Password);
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return Unauthorized("Érvénytelen felhasználónév vagy jelszó.");
+            }
+
+            // Itt token generálás is lehetséges, ha szükséges
+            return Ok(new { Message = "Bejelentkezés sikeres", AdminId = admin.Id });
         }
     }
 
