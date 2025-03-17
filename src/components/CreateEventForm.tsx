@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface CreateEventFormProps {
   user?: { fullName: string } | null;
@@ -9,13 +9,28 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
     partyName: '',
     date: '',
     time: '',
-    locationName: '',  // Átnevezve location helyett
+    locationName: '',
     address: '',
     equipment: '',
     guests: '',
     theme: '',
     description: '',
   });
+
+  // ÚJ: Figyeljük az ablakméretet, hogy mobil nézetben (<= 767px) ne jelenjen meg a kép
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+    // Első hívás a komponens betöltésekor
+    handleResize();
+    // Eseményfigyelő ablakméret változásra
+    window.addEventListener('resize', handleResize);
+    // Takarítás
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -32,18 +47,16 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       return;
     }
 
-    // Ellenőrizzük, hogy a date és time mezők ki vannak töltve
     if (!formData.date || !formData.time) {
       alert('Kérlek, add meg a dátumot és az időpontot!');
       return;
     }
 
-    // Összeállítjuk az esemény adatait a backend által elvárt mezőnevekkel.
     const eventData = {
       partyName: formData.partyName,
-      date: formData.date,           // A backend a Date típusú property-ként várja (pl. "2025-06-09")
-      time: formData.time,           // Az időpont string, pl. "18:30"
-      locationName: formData.locationName, // Most már megfelelően
+      date: formData.date,
+      time: formData.time,
+      locationName: formData.locationName,
       address: formData.address,
       equipment: formData.equipment,
       guests: parseInt(formData.guests, 10),
@@ -51,7 +64,6 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       description: formData.description,
     };
 
-    // JWT token kikérése a localStorage-ból:
     const token = localStorage.getItem('jwtToken');
 
     try {
@@ -75,7 +87,6 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
       alert('Hiba történt az esemény létrehozása során');
     }
 
-    // Mezők törlése
     setFormData({
       partyName: '',
       date: '',
@@ -221,13 +232,16 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ user }) => {
           </form>
         </div>
 
-        <div className="right-side">
-          <img
-            src="src/telcsi.png"
-            alt="party-pic"
-            style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-          />
-        </div>
+        {/* A kép csak akkor jelenik meg, ha NEM mobil nézet */}
+        {!isMobile && (
+          <div className="right-side">
+            <img
+              src="./kepek_jegyzetek/létrehozoskép.png"
+              alt="party-pic"
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

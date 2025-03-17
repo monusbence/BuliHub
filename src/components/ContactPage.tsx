@@ -39,9 +39,20 @@ const ContactPage = () => {
   const storedUser = localStorage.getItem('user');
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
+  // Kijelentkezési függvény
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('user');
+    window.location.reload();
+  };
+
   return (
     <div className="page-container">
-      <Navbar user={currentUser} onRegisterClick={() => setIsRegisterModalOpen(true)} />
+      <Navbar
+        user={currentUser}
+        onRegisterClick={() => setIsRegisterModalOpen(true)}
+        onLogout={handleLogout}
+      />
 
       <main className="contact-main-content">
         <h1>Kapcsolat</h1>

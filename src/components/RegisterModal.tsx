@@ -95,56 +95,14 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
     setCertifiedFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCertifiedSubmit = async (e: React.FormEvent) => {
+  // Itt jön a módosítás: nem küldünk fetch-et, csak alert
+  const handleCertifiedSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (certifiedFormData.password !== certifiedFormData.confirmPassword) {
-      alert('A két jelszó nem egyezik!');
-      return;
-    }
-    const registerData = {
-      OrganizerName: certifiedFormData.organizerName,
-      CompanyName: certifiedFormData.companyName,
-      TaxNumber: certifiedFormData.taxNumber,
-      CompanyRegisterNumber: certifiedFormData.companyRegisterNumber,
-      PhoneNumber: certifiedFormData.phoneNumber,
-      Email: certifiedFormData.email,
-      Address: certifiedFormData.address,
-      Website: certifiedFormData.website,
-      ShortDescription: certifiedFormData.shortDescription,
-      BankAccount: certifiedFormData.bankAccount,
-    };
-    try {
-      const response = await fetch('https://localhost:7248/api/Auth/registercertified', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert('Regisztráció sikertelen: ' + JSON.stringify(errorData));
-      } else {
-        alert('Köszönjük! A hitelesítés folyamatban van.');
-      }
-    } catch (error) {
-      console.error('Hiba a regisztráció során:', error);
-      alert('Hiba történt a regisztráció során');
-    }
-    setCertifiedFormData({
-      organizerName: '',
-      companyName: '',
-      taxNumber: '',
-      companyRegisterNumber: '',
-      phoneNumber: '',
-      email: '',
-      address: '',
-      website: '',
-      shortDescription: '',
-      bankAccount: '',
-      idDocument: null,
-      password: '',
-      confirmPassword: '',
-    });
-    onClose();
+    // Ha szeretnéd, megvizsgálhatod a password == confirmPassword-t, de
+    // a kérés alapján mindenképp a "fejlesztés alatt" alert jelenik meg:
+    alert('A regisztráció nem lehetséges,a hitelesített profil funkciói fejlesztés alatt áll!');
+    // Visszatérés, nem történik semmi további
+    return;
   };
 
   return (
@@ -476,7 +434,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Küldés
+              Regisztráció
             </motion.button>
           </form>
         )}

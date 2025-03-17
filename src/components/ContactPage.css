@@ -16,6 +16,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
 .content-wrapper {
@@ -250,5 +251,46 @@ body {
   .contact-info,
   .contact-form {
       width: 90%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar-nav {
+    width: 150px;
+  }
+
+  .content-wrapper {
+    flex-direction: row;
+  }
+
+  .contact-content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .cancel {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    background-Color: #39393b;
+    border: none;
+    color: white;
+  }
+
+  .cancel:hover {
+    background-color: #55555c;
+    color: black;
+  }
+
+  .save {
+    background-Color: #c841c6;
+    padding: 0.5rem 1rem;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .save:hover {
+    background-color: #852883;
+    color: black;
   }
 }

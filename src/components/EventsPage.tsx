@@ -56,9 +56,16 @@ const EventsPage: React.FC = () => {
   const [editEvent, setEditEvent] = useState<EventItem | null>(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  // A bejelentkezett felhasználó kinyerése a localStorage-ből
+  // Bejelentkezett felhasználó
   const storedUser = localStorage.getItem('user');
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+  // Kijelentkezési függvény
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('user');
+    window.location.reload();
+  };
 
   // Események lekérése a backendről
   useEffect(() => {
@@ -127,7 +134,6 @@ const EventsPage: React.FC = () => {
         ? event.organizer.toLowerCase() === currentUser.fullName.toLowerCase()
         : false
       : true;
-
     return (
       matchKeyword &&
       matchCategory &&
@@ -224,7 +230,50 @@ const EventsPage: React.FC = () => {
     }
   };
 
-  // Szerkesztési modal komponens
+  // Részletek Modal – az esemény összes adatát (beleértve a képet) megjelenítjük
+  const DetailsModal: React.FC<{ event: EventItem; onClose: () => void }> = ({
+    event,
+    onClose,
+  }) => {
+    return (
+      <div className="modal">
+        <div className="modal-content">
+          <img
+            src={event.imageUrl}
+            alt={event.title}
+            style={{ width: '100%', marginBottom: '1rem', borderRadius: '4px' }}
+          />
+          <h2>{event.title}</h2>
+          <p>
+            <strong>Leírás:</strong> {event.description}
+          </p>
+          <p>
+            <strong>Kezdés:</strong> {formatDateTime(event.startDate)}
+          </p>
+          <p>
+            <strong>Befejezés:</strong> {formatDateTime(event.endDate)}
+          </p>
+          <p>
+            <strong>Helyszín:</strong> {event.location}
+            {event.address && `, ${event.address}`}
+          </p>
+          {event.equipment && <p><strong>Extrák:</strong> {event.equipment}</p>}
+          <p>
+            <strong>Vendégek száma:</strong> {event.guests}
+          </p>
+          <p>
+            <strong>Kategória:</strong> {event.category}
+          </p>
+          <p>
+            <strong>Szervező:</strong> {event.organizer}
+          </p>
+          <button onClick={onClose}>Bezár</button>
+        </div>
+      </div>
+    );
+  };
+
+  // Szerkesztési Modal
   const EditEventModal: React.FC<{ event: EventItem; onClose: () => void }> = ({
     event,
     onClose,
@@ -336,7 +385,11 @@ const EventsPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <Navbar user={currentUser} onRegisterClick={() => setIsRegisterModalOpen(true)} />
+      <Navbar
+        user={currentUser}
+        onRegisterClick={() => setIsRegisterModalOpen(true)}
+        onLogout={handleLogout}
+      />
 
       <main className="events-main-content">
         <h1>Események</h1>
@@ -374,12 +427,10 @@ const EventsPage: React.FC = () => {
             Saját bulik
           </label>
 
-          {/* Részletes szűrés gomb */}
           <button onClick={() => setShowDetailedFilters(!showDetailedFilters)}>
             {showDetailedFilters ? 'Alap szűrés' : 'Részletes szűrés'}
           </button>
 
-          {/* Részletes szűrés mezői */}
           {showDetailedFilters && (
             <>
               <input
@@ -457,7 +508,10 @@ const EventsPage: React.FC = () => {
                     <strong>Helyszín:</strong> {event.location}
                     {event.address && `, ${event.address}`}
                   </p>
-                  {event.equipment && <p>Extrák: {event.equipment}</p>}
+                  {event.equipment && <p><strong>Extrák:</strong> {event.equipment}</p>}
+                  <p>
+                    <strong>Vendégek száma:</strong> {event.guests}
+                  </p>
                   <p>
                     <strong>Kategória:</strong> {event.category}
                   </p>
@@ -498,32 +552,7 @@ const EventsPage: React.FC = () => {
 
       {/* Részletek Modal */}
       {selectedEvent && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>{selectedEvent.title}</h2>
-            <p>
-              <strong>Leírás:</strong> {selectedEvent.description}
-            </p>
-            <p>
-              <strong>Kezdés:</strong> {formatDateTime(selectedEvent.startDate)}
-            </p>
-            <p>
-              <strong>Befejezés:</strong> {formatDateTime(selectedEvent.endDate)}
-            </p>
-            <p>
-              <strong>Helyszín:</strong> {selectedEvent.location}
-              {selectedEvent.address && `, ${selectedEvent.address}`}
-            </p>
-            {selectedEvent.equipment && <p>Extrák: {selectedEvent.equipment}</p>}
-            <p>
-              <strong>Kategória:</strong> {selectedEvent.category}
-            </p>
-            <p>
-              <strong>Szervező:</strong> {selectedEvent.organizer}
-            </p>
-            <button onClick={() => setSelectedEvent(null)}>Bezár</button>
-          </div>
-        </div>
+        <DetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}
 
       {/* Módosítás Modal */}

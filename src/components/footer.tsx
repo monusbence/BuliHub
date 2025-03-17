@@ -1,12 +1,35 @@
 import React from 'react';
-import './Footer.css'; 
+import { useNavigate } from 'react-router-dom';
+import './Footer.css';
 
-function Footer () {
+function Footer() {
+  const navigate = useNavigate();
+
+  const handleMainClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigate("/");
+  };
+
+  const handleResultsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    // Navigáljunk a főoldalra, majd görgetünk a section2-re
+    navigate("/");
+    setTimeout(() => {
+      const section2 = document.getElementById("section2");
+      if (section2) {
+        section2.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
+  const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigate("/contact");
+  };
+
   return (
     <footer className="footer">
-      
       <div className="footer-top">
-        {}
         <div className="footer-column">
           <img
             src="./kepek_jegyzetek/MainLogo(png).png"
@@ -19,26 +42,24 @@ function Footer () {
           </p>
         </div>
 
-        
         <div className="footer-column">
           <h3>Menü</h3>
           <ul className="footer-links">
             <li>
-              <a href="#section1">Főoldal</a>
+              <a href="/" onClick={handleMainClick}>Főoldal</a>
             </li>
             <li>
-              <a href="#section2">Eredmények</a>
+              <a href="/#section2" onClick={handleResultsClick}>Eredmények</a>
             </li>
             <li>
-              <a href="#section3">Kapcsolat</a>
+              <a href="/events">Események</a>
             </li>
             <li>
-              <a href="#hitelesites">Hitelesítés</a>
+              <a href="/contact" onClick={handleContactClick}>Kapcsolat</a>
             </li>
           </ul>
         </div>
 
-        
         <div className="footer-column">
           <h3>Elérhetőségek</h3>
           <p>Cím: 4032 Debrecen, Cívis utca 3.</p>
@@ -46,7 +67,6 @@ function Footer () {
           <p>E-mail: info@bulihub.hu</p>
         </div>
 
-        
         <div className="footer-column">
           <h3>Hírlevél</h3>
           <p>Iratkozz fel, hogy elsőként értesülj a legújabb bulikról!</p>
@@ -63,8 +83,7 @@ function Footer () {
           </form>
         </div>
       </div>
-      
-      
+
       <div className="footer-bottom">
         <p>
           &copy; {new Date().getFullYear()} BuliHub. Minden jog fenntartva.
@@ -83,6 +102,6 @@ function Footer () {
       </div>
     </footer>
   );
-};
+}
 
 export default Footer;
