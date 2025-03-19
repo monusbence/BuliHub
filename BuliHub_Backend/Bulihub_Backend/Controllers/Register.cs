@@ -95,14 +95,11 @@ namespace BuliHub_Backend.Controllers
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
-            // Debug log: ellenőrizzük, hogy az endpoint meghívódik-e
             Console.WriteLine("ForgotPassword endpoint called with email: " + dto.Email);
-
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
                 Console.WriteLine("User not found for email: " + dto.Email);
-                // A biztonság érdekében ugyanazt a válasz üzenetet adjuk vissza, függetlenül attól, hogy létezik-e az email
                 return Ok("Ha az email létezik, elküldtük a jelszó emlékeztetőt.");
             }
 
@@ -111,13 +108,14 @@ namespace BuliHub_Backend.Controllers
             var resetResult = await _userManager.ResetPasswordAsync(user, token, tempPassword);
             if (!resetResult.Succeeded)
             {
-                Console.WriteLine("Password reset failed for email: " + dto.Email);
-                return BadRequest("Jelszó visszaállítása sikertelen.");
+                var errorMessages = string.Join("; ", resetResult.Errors.Select(e => e.Description));
+                Console.WriteLine("Password reset failed for email: " + dto.Email + " Reason(s): " + errorMessages);
+                return BadRequest("Jelszó visszaállítása sikertelen. Részletek: " + errorMessages);
             }
 
             try
             {
-                await SendPasswordReminderEmail(dto.Email, tempPassword);
+                await SendPasswordReminderEmail(dto.Email, user.Name, tempPassword);
                 Console.WriteLine("Email sent successfully to: " + dto.Email);
             }
             catch (Exception ex)
@@ -131,20 +129,19 @@ namespace BuliHub_Backend.Controllers
 
         private string GenerateTemporaryPassword(int length = 10)
         {
-            // A jelszó tartalmaz kis- és nagybetűket, számokat, speciális karaktereket
+            // Bővített karakterkészlet, hogy megfeleljen a jelszókövetelményeknek
             const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
             var random = new Random();
             return new string(Enumerable.Repeat(validChars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-
-        private async Task SendPasswordReminderEmail(string toEmail, string tempPassword)
+        private async Task SendPasswordReminderEmail(string toEmail, string username, string tempPassword)
         {
             var fromAddress = new MailAddress("bulihubhu@gmail.com", "BuliHub");
             var toAddress = new MailAddress(toEmail);
             string subject = "BuliHub jelszó emlékeztető";
-            string body = $"Kedves Felhasználó,\n\nAz új ideiglenes jelszavad: {tempPassword}\nKérjük, jelentkezz be, és módosítsd a jelszavad!\n\nÜdvözlettel,\nBuliHub csapata";
+            string body = $"Kedves {username},\n\nAz új jelszavad: {tempPassword}\nKérjük, jelentkezz be\n\nÜdvözlettel,\nBuliHub csapata";
 
             using (var smtp = new SmtpClient())
             {
@@ -153,7 +150,6 @@ namespace BuliHub_Backend.Controllers
                 smtp.EnableSsl = true;
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.UseDefaultCredentials = false;
-                smtp.EnableSsl = true;
                 smtp.Credentials = new NetworkCredential("bulihubhu@gmail.com", "pndgkozampthqfib");
 
                 using (var message = new MailMessage(fromAddress, toAddress)
