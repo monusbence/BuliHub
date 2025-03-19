@@ -71,10 +71,13 @@ namespace BuliHub_Backend.Controllers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.Name)
-            };
+        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        // A név claimben a user.Name
+        new Claim(ClaimTypes.Name, user.Name),
+        // Ha szeretnéd, email claimet is adhatsz
+        new Claim(ClaimTypes.Email, user.Email ?? "")
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey@345SuperSecretKey@345"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -88,8 +91,15 @@ namespace BuliHub_Backend.Controllers
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Ok(new { token = jwtToken, name = user.Name });
+            // VISSZAADJUK A NEVET ÉS AZ EMAILT IS
+            return Ok(new
+            {
+                token = jwtToken,
+                name = user.Name,
+                email = user.Email
+            });
         }
+
 
         // POST: api/auth/forgotpassword
         [HttpPost("forgotpassword")]

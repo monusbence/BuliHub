@@ -1,98 +1,136 @@
-/* Alap navbar */
+/* NAVBAR.CSS */
+
+/* Fix pozíció, enyhén sötét háttér, blur effekt => "régi" stílusú navbar */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    position: relative;
-  }
-  
-  /* Logo */
-  .logo img {
-    height: 40px;
-    width: auto;
-  }
-  
-  /* Alap rejtett hamburger, desktopon nincs rá szükség */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(119, 117, 117, 0.3); /* enyhe sötét réteg */
+  backdrop-filter: blur(10px);    /* blur hatás */
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  z-index: 9999;
+}
+
+/* Alap beállítások a body-hoz */
+body, .app-container {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+/* Logo bal oldalon */
+.logo img {
+  height: 40px;
+  width: auto;
+}
+
+/* Hamburger ikon (csak mobilon látszik) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 4px 0;
+}
+
+.disabled {
+  pointer-events: none;
+  color: #888;
+  opacity: 0.7;
+}
+
+/* Menüpontok (Főoldal, Események, Kapcsolat, Profilom) listája */
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin-left: 2rem; /* kicsi távolság a logótól */
+}
+
+/* Alap link-stílus */
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.nav-links li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Profil link (nincs ikon) */
+.profile-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #0af; /* türkiz */
+}
+
+/* Bejelentkezett felhasználó adatai (név, kijelentkezés) 
+   bal oldalon maradnak, a menüpontok után */
+.user-info {
+  margin-left: 2rem; 
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Kijelentkezés gomb */
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+/* Mobilnézet (max 768px) */
+@media (max-width: 768px) {
   .hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
+    display: flex;
+    margin-left: auto;
   }
-  
-  .hamburger span {
-    width: 25px;
-    height: 3px;
-    background: white;
-    margin: 4px 0;
-  }
-  
-  /* Az alap menü (desktop) */
+
   .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    flex-direction: column;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    width: 200px;
+    padding: 1rem;
+    display: none; /* rejtve, amíg nincs .open */
+  }
+
+  .nav-links.open {
     display: flex;
-    gap: 1.5rem;
-    list-style: none;
   }
-  .nav-links a.disabled {
-    pointer-events: none;
-    color: #888; /* vagy bármilyen szürke árnyalat */
-  }
-  
-  .nav-links li a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 0.5rem 0.8rem;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-  }
-  
-  .nav-links li a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  /* Jobbra igazított user info (bejelentkezett felhasználó) */
-  .user-info {
-    margin-left: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .logout-btn {
-    background-color: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .logout-btn:hover {
-    background-color: #fff;
-    color: #000;
-  }
-  
-  /* MOBIL nézet (max 768px) */
-  @media (max-width: 768px) {
-    .hamburger {
-      display: flex;
-    }
-  
-    .nav-links {
-      position: absolute;
-      top: 60px;
-      right: 0;
-      flex-direction: column;
-      gap: 1rem;
-      background: rgba(0, 0, 0, 0.8);
-      width: 200px;
-      padding: 1rem;
-      display: none; /* rejtve, amíg nincs open */
-    }
-  
-    .nav-links.open {
-      display: flex;
-    }
-  }
-  
+}

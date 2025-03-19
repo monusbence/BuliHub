@@ -8,7 +8,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #000;
+  
   color: #fff;
   font-family: 'Arial', sans-serif;
   scrollbar-width: none;
@@ -64,19 +64,6 @@ body {
 }
 
 /* NAVBAR */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  padding: 0 2rem;
-  z-index: 999;
-}
 
 .navbar .logo img {
   width: 120px;
