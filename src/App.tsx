@@ -7,6 +7,7 @@ import HeroSection from './components/HeroSection';
 import StatisticsSection from './components/StatisticsSection';
 import CreateEventForm from './components/CreateEventForm';
 import RegisterModal from './components/RegisterModal';
+import ForgotPasswordModal from './components/ForgotPasswordModal';
 import './App.css';
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
 
   // Regisztrációs modal
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  // Elfelejtett jelszó modal
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
 
   // Telefongörgetés állapot (progress és locked)
   const [locked, setLocked] = useState(true);
@@ -150,8 +154,10 @@ function App() {
           setLoginPassword={setLoginPassword}
           handleLogin={handleLogin}
           onRegisterClick={() => setIsRegisterModalOpen(true)}
+          onForgotPasswordClick={() => setIsForgotPasswordModalOpen(true)}
           user={user}
         />
+
 
         {/* Statisztikák */}
         <StatisticsSection />
@@ -174,6 +180,13 @@ function App() {
       <AnimatePresence>
         {isRegisterModalOpen && (
           <RegisterModal onClose={() => setIsRegisterModalOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Elfelejtett jelszó modal */}
+      <AnimatePresence>
+        {isForgotPasswordModalOpen && (
+          <ForgotPasswordModal onClose={() => setIsForgotPasswordModalOpen(false)} />
         )}
       </AnimatePresence>
 

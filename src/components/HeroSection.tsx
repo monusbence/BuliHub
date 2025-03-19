@@ -9,6 +9,7 @@ interface HeroSectionProps {
   setLoginPassword?: React.Dispatch<React.SetStateAction<string>>;
   handleLogin?: () => void;
   onRegisterClick: () => void;
+  onForgotPasswordClick: () => void; // Új prop hozzáadva
   user?: { fullName: string } | null;
 }
 
@@ -20,6 +21,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   setLoginPassword = () => {},
   handleLogin = () => {},
   onRegisterClick,
+  onForgotPasswordClick,
   user = null,
 }) => {
   const [mobileMode, setMobileMode] = useState(false);
@@ -33,14 +35,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
-  // Egy közös keyDown kezelő, amely az Enter lenyomása esetén meghívja a handleLogin függvényt.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleLogin();
     }
   };
 
-  // Közös logged-in üzenet stílus (desktop és mobil esetén)
   const loggedInMessage = (
     <div
       style={{
@@ -110,10 +110,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </>
           )}
-          {/* Csak akkor jelenjen meg, ha nincs bejelentkezve */}
           {!user && (
             <div style={{ marginBottom: '1rem' }}>
-              <a href="#" className="forgot-link">
+              <a
+                href="#"
+                className="forgot-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onForgotPasswordClick();
+                }}
+              >
                 Elfelejtetted a jelszavad?
               </a>
               <br />
@@ -181,10 +187,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   </button>
                 </>
               )}
-              {/* Csak akkor jelenjenek meg, ha nincs bejelentkezve */}
               {!user && (
                 <>
-                  <a href="#" className="forgot-link">
+                  <a
+                    href="#"
+                    className="forgot-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onForgotPasswordClick();
+                    }}
+                  >
                     Elfelejtetted a jelszavad?
                   </a>
                   <a href="#" className="register-link" onClick={onRegisterClick}>
