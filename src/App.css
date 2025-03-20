@@ -8,7 +8,7 @@
 body {
   margin: 0;
   padding: 0;
-  
+  min-width: 100vw;
   color: #fff;
   font-family: 'Arial', sans-serif;
   scrollbar-width: none;

@@ -64,7 +64,7 @@ function Footer() {
           <h3>Elérhetőségek</h3>
           <p>Cím: 4032 Debrecen, Cívis utca 3.</p>
           <p>Telefon: +36 30 332 9083</p>
-          <p>E-mail: info@bulihub.hu</p>
+          <p>E-mail: bulihubhu@gmail.com</p>
         </div>
 
         <div className="footer-column">

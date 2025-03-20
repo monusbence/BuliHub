@@ -120,7 +120,7 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="container">
       {/* A Navbar-nak átadjuk a usert, logoutot, stb. */}
       <Navbar
         user={loggedInUser}
@@ -181,9 +181,9 @@ const ProfilePage: React.FC = () => {
           {message && <p className="message">{message}</p>}
         </div>
       </div>
-
       <Footer />
-    </>
+
+    </div>
   );
 };
 

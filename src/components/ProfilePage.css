@@ -6,7 +6,9 @@
     border-radius: 8px;
     color: #fff;
   }
-  
+  .container {
+    min-width: 100vw;
+  }
   .profile-container h1 {
     text-align: center;
     margin-bottom: 1.5rem;

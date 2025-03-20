@@ -17,6 +17,7 @@ const ContactPage = () => {
     message: '',
   });
 
+  // Űrlapadatok kezelése
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -24,10 +25,32 @@ const ContactPage = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Űrlap beküldése a backend /api/contact végponthoz
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Űrlapadatok:', formData);
-    // Itt végezhetsz API-hívást
+
+    try {
+      // Használj abszolút URL-t, ha a backend külön hoston/porton fut,
+      // vagy konfiguráld a proxy-t a package.json-ban és használj relatív URL-t.
+      const response = await fetch('https://localhost:7248/api/Contact/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        console.error("Hiba történt az üzenet küldése során", await response.text());
+      } else {
+        console.log("Üzenet sikeresen elküldve");
+      }
+    } catch (error) {
+      console.error("Hiba: ", error);
+    }
+
+    // Űrlap adatainak törlése
     setFormData({
       name: '',
       email: '',
@@ -59,14 +82,14 @@ const ContactPage = () => {
         <div className="contact-content">
           <div className="contact-info">
             <h2>Elérhetőségek</h2>
-            <p><strong>Cím:</strong> 1234 Budapest, Példa utca 1.</p>
-            <p><strong>Telefon:</strong> +36 30 123 4567</p>
-            <p><strong>Email:</strong> info@pelda.hu</p>
+            <p><strong>Cím:</strong> 4032 Debrecen, Cívis utca 3.</p>
+            <p><strong>Telefon:</strong> +36 30 332 9083</p>
+            <p><strong>Email:</strong> bulihubhu@gmail.com</p>
           </div>
 
           <div className="contact-form">
             <h2>Írj nekünk!</h2>
-            <form onSubmit={handleSubmit}>
+            <form>
               <input
                 type="text"
                 name="name"
@@ -90,7 +113,7 @@ const ContactPage = () => {
                 onChange={handleChange}
                 required
               />
-              <button type="submit">Küldés</button>
+              <button onClick={handleSubmit} type="submit">Küldés</button>
             </form>
           </div>
         </div>
