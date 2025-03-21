@@ -1,0 +1,6 @@
+2.2 - reszletesen
+2.3 az erdekeseket
+2.4 unit teszt kell bele
+3.3 reszletesen
+
+wpf admin kiegeszites+unit teszt
