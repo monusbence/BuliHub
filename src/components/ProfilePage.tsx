@@ -6,16 +6,15 @@ import './ProfilePage.css';
 interface Profile {
   fullName: string;
   email: string;
+  birthDate?: string;
+  city?: string;
+  // A backend esetleg számként vagy stringként adja vissza a gender értéket
+  gender?: number | string;
 }
 
 const ProfilePage: React.FC = () => {
-  // A profil adatok, amit a backendről töltünk be
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Ez a state megy át a Navbarnak, hogy ott is lássa, hogy be vagy jelentkezve
-  // és kiírja a nevet a jobb oldalon.
-  const [loggedInUser, setLoggedInUser] = useState<{ fullName: string; email?: string } | null>(null);
 
   // Állapotok a jelszó módosításhoz
   const [currentPassword, setCurrentPassword] = useState('');
@@ -23,15 +22,25 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
 
+  // A Navbar számára, hogy lássa, ki van bejelentkezve
+  const [loggedInUser, setLoggedInUser] = useState<{ fullName: string; email?: string } | null>(null);
+
+  // Segédfüggvény a gender konvertálására
+  const getGenderText = (gender?: number | string) => {
+    const g = Number(gender);
+    if (g === 1) return "Férfi";
+    if (g === 0) return "Nő";
+    return "";
+  };
+
   useEffect(() => {
-    // Először megnézzük a localStorage-t, hogy ott van-e a user
+    // LocalStorage-ból betöltjük a user adatait, ha vannak
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      // Ha van, betöltjük, így a Navbar is látja
       setLoggedInUser(JSON.parse(storedUser));
     }
 
-    // Ha nincs token, akkor nincs bejelentkezve
+    // Ha nincs token, nincs bejelentkezve
     const token = localStorage.getItem('jwtToken');
     if (!token) {
       setLoading(false);
@@ -53,9 +62,8 @@ const ProfilePage: React.FC = () => {
         return res.json();
       })
       .then((data) => {
-        // data: { fullName: string, email: string }
+        // A backend a következő mezőket adja vissza: fullName, email, birthDate, city, gender
         setProfile(data);
-        // A Navbar is ezt használja (név, email)
         setLoggedInUser({ fullName: data.fullName, email: data.email });
         setLoading(false);
       })
@@ -65,7 +73,7 @@ const ProfilePage: React.FC = () => {
       });
   }, []);
 
-  // Jelszó módosítás
+  // Jelszó módosítás kezelése
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -104,7 +112,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  // Kijelentkezés: töröljük a tokeneket, visszairányítunk
+  // Kijelentkezés kezelése
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     localStorage.removeItem('user');
@@ -121,12 +129,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="container">
-      {/* A Navbar-nak átadjuk a usert, logoutot, stb. */}
-      <Navbar
-        user={loggedInUser}
-        onLogout={handleLogout}
-        onRegisterClick={() => {}}
-      />
+      <Navbar user={loggedInUser} onLogout={handleLogout} onRegisterClick={() => {}} />
 
       <div className="profile-container">
         <h1>Profilom</h1>
@@ -137,6 +140,15 @@ const ProfilePage: React.FC = () => {
             </p>
             <p>
               <strong>Email:</strong> {profile.email}
+            </p>
+            <p>
+              <strong>Születési dátum:</strong> {profile.birthDate}
+            </p>
+            <p>
+              <strong>Város:</strong> {profile.city}
+            </p>
+            <p>
+              <strong>Neme:</strong> {getGenderText(profile.gender)}
             </p>
           </div>
         )}
@@ -182,7 +194,6 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
       <Footer />
-
     </div>
   );
 };
