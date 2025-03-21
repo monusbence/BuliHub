@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudinary/url-gen": "^1.21.0",
     "@react-google-maps/api": "^2.20.5",
+    "cloudinary": "^2.6.0",
     "framer-motion": "^12.0.8",
     "motion": "^11.18.2",
     "react": "^18.3.1",

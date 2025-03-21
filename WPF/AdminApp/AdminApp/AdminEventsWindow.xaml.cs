@@ -5,6 +5,8 @@ using System.Net.Http.Json;
 using System.Windows;
 using System.Linq;
 using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace AdminApp
 {
@@ -209,6 +211,33 @@ namespace AdminApp
             AdminUsersWindow usersWindow = new AdminUsersWindow();
             usersWindow.Show();
             this.Close();
+        }
+
+        // Szűrési funkció: Amikor a FilterTextBox tartalma változik, frissítjük a listát
+        private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var view = CollectionViewSource.GetDefaultView(EventsListBox.ItemsSource);
+            if (view != null)
+            {
+                view.Filter = FilterEvents;
+                view.Refresh();
+            }
+        }
+
+        // Szűrési logika: itt a Theme (az esemény neve) alapján szűrünk
+        private bool FilterEvents(object item)
+        {
+            // Ellenőrizzük, hogy a FilterTextBox létezik-e
+            if (FilterTextBox == null)
+                return true;
+            // Ha a szűrő üres, minden elem megjelenik
+            if (string.IsNullOrWhiteSpace(FilterTextBox.Text))
+                return true;
+
+            var ev = item as EventEditViewModel;
+            if (ev == null)
+                return false;
+            return ev.Theme.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }
