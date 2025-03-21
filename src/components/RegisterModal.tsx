@@ -95,13 +95,11 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
     setCertifiedFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Itt jön a módosítás: nem küldünk fetch-et, csak alert
+  // A hitelesített regisztrációnál mostantól nem történik fetch, csak alert,
+  // de a gomb disabled állapotban van, így nem lehet kattintani.
   const handleCertifiedSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Ha szeretnéd, megvizsgálhatod a password == confirmPassword-t, de
-    // a kérés alapján mindenképp a "fejlesztés alatt" alert jelenik meg:
-    alert('A regisztráció nem lehetséges,a hitelesített profil funkciói fejlesztés alatt áll!');
-    // Visszatérés, nem történik semmi további
+    alert('A regisztráció nem lehetséges, a hitelesített profil funkciói fejlesztés alatt áll!');
     return;
   };
 
@@ -431,8 +429,11 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
             <motion.button
               type="submit"
               className="btn submit-btn"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              disabled
+              style={{
+                backgroundColor: '#ccc',
+                cursor: 'not-allowed',
+              }}
             >
               Regisztráció
             </motion.button>
