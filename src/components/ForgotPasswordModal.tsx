@@ -46,7 +46,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
             <div className="form-group">
             <label htmlFor="forgot-email" style={{ color: 'black' }}>Email</label>
               <input
-              style={{ color: 'black', backgroundColor: 'light-grey', border:'black' }}
+              style={{ color: 'white', backgroundColor: 'gray', border:'black' }}
                 type="email"
                 id="forgot-email"
                 value={email}
