@@ -1,9 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Footer.css';
 
 function Footer() {
   const navigate = useNavigate();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('https://localhost:7248/api/Hirlevel/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: newsletterEmail })
+      });
+
+      if (response.ok) {
+        setMessage('Feliratkozás sikeres! Kérjük, ellenőrizd az email fiókodat a visszaigazoló levélért.');
+        setNewsletterEmail('');
+      } else {
+        const errorText = await response.text();
+        console.error('Hiba a válaszból:', errorText);
+        setMessage('Hiba történt, kérjük próbáld újra később.');
+      }
+    } catch (error) {
+      console.error('Hiba a fetch során:', error);
+      setMessage('Hiba történt, kérjük próbáld újra később.');
+    }
+  };
 
   const handleMainClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -12,7 +40,6 @@ function Footer() {
 
   const handleResultsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    // Navigáljunk a főoldalra, majd görgetünk a section2-re
     navigate("/");
     setTimeout(() => {
       const section2 = document.getElementById("section2");
@@ -70,17 +97,20 @@ function Footer() {
         <div className="footer-column">
           <h3>Hírlevél</h3>
           <p>Iratkozz fel, hogy elsőként értesülj a legújabb bulikról!</p>
-          <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="newsletter-form" onSubmit={handleSubscribe}>
             <input
               type="email"
               placeholder="E-mail címed"
               aria-label="E-mail címed"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               required
             />
-            <button type="submit" className="btn newsletter-btn">
+            <button type="submit" className="newsletter-btn">
               Feliratkozom
             </button>
           </form>
+          {message && <p>{message}</p>}
         </div>
       </div>
 
@@ -89,13 +119,25 @@ function Footer() {
           &copy; {new Date().getFullYear()} BuliHub. Minden jog fenntartva.
         </p>
         <div className="footer-socials">
-          <a href="https://www.facebook.com/profile.php?id=61572704108154&sk=about" target="_blank" rel="noreferrer">
+          <a
+            href="https://www.facebook.com/profile.php?id=61572704108154&sk=about"
+            target="_blank"
+            rel="noreferrer"
+          >
             <img src="./kepek_jegyzetek/face.png" alt="Facebook" />
           </a>
-          <a href="https://www.instagram.com/bulihub/" target="_blank" rel="noreferrer">
+          <a
+            href="https://www.instagram.com/bulihub/"
+            target="_blank"
+            rel="noreferrer"
+          >
             <img src="./kepek_jegyzetek/insta.png" alt="Instagram" />
           </a>
-          <a href="https://twitter.com" target="_blank" rel="noreferrer">
+          <a
+            href="https://twitter.com"
+            target="_blank"
+            rel="noreferrer"
+          >
             <img src="./kepek_jegyzetek/X.png" alt="X" />
           </a>
         </div>

@@ -35,6 +35,13 @@ namespace AdminApp
             {
                 MessageBox.Show("Hiba: " + await response.Content.ReadAsStringAsync());
             }
+
+        }
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+            this.Close();
         }
     }
 

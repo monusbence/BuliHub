@@ -82,7 +82,7 @@ const ContactPage = () => {
         <div className="contact-content">
           <div className="contact-info">
             <h2>Elérhetőségek</h2>
-            <p><strong>Cím:</strong> 4032 Debrecen, Cívis utca 3.</p>
+            <p><strong>Cím:</strong> 4029 Debrecen, Monostor utca 12.</p>
             <p><strong>Telefon:</strong> +36 30 332 9083</p>
             <p><strong>Email:</strong> bulihubhu@gmail.com</p>
           </div>
