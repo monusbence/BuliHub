@@ -3,9 +3,6 @@ import Footer from './footer';
 import Navbar from './navbar';
 import RegisterModal from './RegisterModal';
 import './EventsPage.css';
-import {Cloudinary} from "@cloudinary/url-gen";
-
-
 
 // Segédfüggvény az időpont formázásához (pl. 2025.12.09 19:30)
 function formatDateTime(dateString: string): string {
@@ -38,7 +35,6 @@ const EventsPage: React.FC = () => {
   // Állapotok az események és betöltés kezelésére
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const cld = new Cloudinary({cloud: {cloudName: 'dbkxkykbp'}});
 
   // Szűrőmezők
   const [keyword, setKeyword] = useState('');
