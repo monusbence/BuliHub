@@ -32,7 +32,8 @@
         </Grid.RowDefinitions>
 
         <!-- Logó szekció: A logót itt illesztettem be -->
-        <Image Grid.Row="0" Source="AppLogo(png).png" Height="150" Margin="20" HorizontalAlignment="Center"/>
+        <Image x:Name="imgLogo" Grid.Row="0" Source="AppLogo(png).png" Height="150" 
+               Margin="20" HorizontalAlignment="Center"/>
 
         <!-- Gombok szekció -->
         
