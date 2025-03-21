@@ -1,11 +1,44 @@
 ﻿<Window x:Class="AdminApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Admin Management" Height="350" Width="525" Background="#000">
+        Title="Admin Management" Height="400" Width="525" Background="#333333">
+    <Window.Resources>
+        <!-- Modern gombstílus lekerekített sarkokkal -->
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Width" Value="200" />
+            <Setter Property="Background" Value="#c841c6" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" >
-            <Button Content="Regisztráció" Width="200" Margin="10" Click="RegisterButton_Click" Background="#c841c6" Foreground="White"/>
-            <Button Content="Bejelentkezés" Width="200" Margin="10" Click="LoginButton_Click" Background="#c841c6" Foreground="White"/>
+        <!-- A Grid két sorra osztva: a logónak és a gomboknak -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Logó szekció: A logót itt illesztettem be -->
+        <Image Grid.Row="0" Source="AppLogo(png).png" Height="150" Margin="20" HorizontalAlignment="Center"/>
+
+        <!-- Gombok szekció -->
+        
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Content="Regisztráció" Click="RegisterButton_Click"/>
+            <Button Content="Bejelentkezés" Click="LoginButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

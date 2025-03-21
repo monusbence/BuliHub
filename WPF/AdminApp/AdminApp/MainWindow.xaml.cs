@@ -22,5 +22,7 @@ namespace AdminApp
             loginWindow.Show();
             this.Close();
         }
+
     }
+
 }
