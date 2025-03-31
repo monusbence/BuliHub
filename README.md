@@ -8,7 +8,7 @@ Ez a README fájl minden olyan információt tartalmaz, amely a projekt értéke
 
 A projekt teljes körű dokumentációja a repóban található:
 
-- `docs/dokumentacio.pdf`  
+- `\BuliHub\BuliHub\Bulihub_dokumentáció.docx`  
   (Tartalmazza a fejlesztői és felhasználói dokumentációt, valamint részletes telepítési és indítási útmutatót is.)
 
 ---
@@ -18,13 +18,13 @@ A projekt teljes körű dokumentációja a repóban található:
 A teljes forráskód az alábbi mappákban található:
 
 - Frontend (React, TypeScript):  
-  **`frontend/`**
+  **`\BuliHub\BuliHub\src`**
 
-- Backend (.NET 7, C#, Entity Framework Core):  
-  **`backend/Bulihub_Backend/`**
+- Backend (.NET 8, C#, Entity Framework Core):  
+  **`/BuliHub\BuliHub\BuliHub_Backend`**
 
 - Admin felület (WPF alkalmazás):  
-  **`admin/Bulihub_AdminWPF/`**
+  **`\BuliHub\BuliHub\WPF\AdminApp`**
 
 ---
 
@@ -48,11 +48,11 @@ A termék kipróbálásához szükséges előkészületek:
 
 - **XAMPP** (Apache és MySQL):
   - [https://www.apachefriends.org/hu/index.html](https://www.apachefriends.org/hu/index.html)
-  - Telepítés után az Apache és MySQL szervereket indítsd el.
+  - Telepítés után az Apache és MySQL szervereket indítsd el, a start gombokra kattintva, aztán a MySQL sorában lévő admin gombot nyomd meg.
 
 ### 2. Frontend függőségek telepítése
 
-Terminálban (`frontend` mappában):
+Terminálban (`src` mappában):
 
 ```bash
 npm i
@@ -65,14 +65,14 @@ npm i react-leaflet@4.2.1
 
 Indítsd el a XAMPP-ot, majd kattints az Admin gombra a MySQL mellett. PhpMyAdminban importáld az adatbázis-fájlt:
 
-- Adatbázisfájl elérhetősége: `adatbazis/adatbazisletrehozas.sql`
+- Adatbázisfájl elérhetősége: `Bulihub_Backend/adatbazisletrehozas.sql`
 - PhpMyAdmin felületén kattints az „Import” fülre, válaszd ki a fájlt, majd kattints az „Importálás” gombra.
 
 ### 4. Backend függőségek telepítése (Visual Studio terminálban)
 
 Navigálj a backend projekt mappájába (`Bulihub_Backend`):
 
-```bash
+```
 cd Bulihub_Backend
 dotnet tool install --global dotnet-ef
 dotnet ef database update
@@ -93,9 +93,9 @@ A projekt részeinek elindítása az alábbi módon történik:
 
 ### Frontend indítása:
 
-Terminálban (`frontend` mappában):
+Terminálban (`src` mappában):
 
-```bash
+```
 npm run dev
 ```
 
@@ -104,14 +104,14 @@ Ezután a weboldal elérhető lesz itt:
 
 ### Admin WPF alkalmazás indítása:
 
-- Nyisd meg a WPF projektet (`Bulihub_AdminWPF.sln`) Visual Studio-ban.
+- Nyisd meg a WPF projektet (`AdminApp.sln`) Visual Studio-ban.
 - Indítsd el (`F5` vagy zöld „Run” gomb).
 
 ---
 
 ## 📋 Tesztadatok betöltése
 
-A tesztadatokat tartalmazó adatbázisfájl (`adatbazis/adatbazisletrehozas.sql`) megtalálható a repo `adatbazis` mappájában. Importálási útmutató a dokumentációban és fentebb található.
+A tesztadatokat tartalmazó adatbázisfájl (`Bulihub_Backend/100Tesztadat.sql`) megtalálható a repo `adatbazis` mappájában. Importálási útmutató a dokumentációban és fentebb található.
 
 ---
 
@@ -119,7 +119,7 @@ A tesztadatokat tartalmazó adatbázisfájl (`adatbazis/adatbazisletrehozas.sql`
 
 A backend Unit tesztek a következő mappában találhatók:
 
-- **`backend/Bulihub_Backend.Tests/`**
+- \BuliHub\BuliHub\BuliHub_Backend\Bulihub_Backend.Tests`**
 
 Indításuk Visual Studioban a Test Explorer segítségével végezhető.
 
@@ -128,9 +128,3 @@ Indításuk Visual Studioban a Test Explorer segítségével végezhető.
 ## 🔗 Külső megosztások, további linkek
 
 Minden szükséges fájl megtalálható a repóban, további külső megosztásra nincs szükség.
-
----
-
-Bármilyen további kérdés esetén a dokumentáció tartalmazza a kapcsolatfelvételi információkat.
-
-Köszönöm az értékelést! 🚀
